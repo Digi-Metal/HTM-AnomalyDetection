@@ -25,18 +25,20 @@ aggregationInfo:
   # aggregation function (e.g. sum). The function will be used to aggregate
   # multiple values of this field over the aggregation period.
   fields:
-  - [consumption, mean]
+  - [pepa_acc_x, mean]
+  - [pepa_acc_y, mean]
+  - [pepa_acc_z, mean]
   # If a time unit is not listed, 0 will be its default value.
   microseconds: 0
   milliseconds: 0
   minutes: 0
   months: 0
-  seconds: 0
-  hours: 1
+  seconds: 1
+  hours: 0
   days: 0
   weeks: 0
   years: 0
-
+  
 predictAheadTime: null
 
 # Parameters of the model to be created.
@@ -62,9 +64,21 @@ modelParams:
 
     # List of encoders and their parameters.
     encoders:
-      consumption:
-        fieldname: consumption
-        name: consumption
+      pepa_acc_x:
+        fieldname: pepa_acc_x
+        name: pepa_acc_x
+        resolution: 0.88
+        seed: 1
+        type: RandomDistributedScalarEncoder
+      pepa_acc_y:
+        fieldname: pepa_acc_y
+        name: pepa_acc_y
+        resolution: 0.88
+        seed: 1
+        type: RandomDistributedScalarEncoder
+      pepa_acc_z:
+        fieldname: pepa_acc_z
+        name: pepa_acc_z
         resolution: 0.88
         seed: 1
         type: RandomDistributedScalarEncoder
