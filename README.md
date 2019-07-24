@@ -6,7 +6,7 @@ This prototype is still in the *very early* stage.
 
 This repository only contains the code snippet and data that used by NuPic to show its functionalities.
 
-*© 2019 Outotec Pty. Ltd. All Rights Reserved*
+***© 2019 Outotec Pty. Ltd. All Rights Reserved***
 
 ## Running screenshots
 
