@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import matplotlib.pyplot as plt
+
 import csv
 from itertools import islice
 import json
-import os
 import time
-from pkg_resources import resource_filename
 
 from nupic.data.file_record_stream import FileRecordStream
 from nupic.engine import Network
@@ -216,7 +216,17 @@ def getDate(recordParams, total = _NUM_RECORDS):
             Record_in_Dict = dict(zip(headers, record))
             date.append(Record_in_Dict["time"])
     return date
-    
+
+def plot_acc_data(x, y, z, date, buffer_size=100):
+    if len(x) > buffer_size and len(y) > buffer_size and len(z) > buffer_size:
+        new_x = x[-buffer_size:]
+        new_y = y[-buffer_size:]
+        new_z = z[-buffer_size:]
+        new_date = date[-buffer_size:]
+        return new_x, new_y, new_z, new_date
+    else:        
+        return x, y, z, date
+	  
 def runNetwork(network1, network2, network3, network4, date1, date2, date3, date4):
     sensorRegion1 = network1.regions["sensor"]
     temporalPoolerRegion1 = network1.regions["temporalPoolerRegion"]
@@ -229,15 +239,25 @@ def runNetwork(network1, network2, network3, network4, date1, date2, date3, date
     
     sensorRegion4 = network4.regions["sensor"]
     temporalPoolerRegion4 = network4.regions["temporalPoolerRegion"]
+	
+    date = []
+    pepa_acc_plot_x = []
+    pepa_acc_plot_y = []
+    pepa_acc_plot_z = []
+	
+    plot = plt.figure("Visulization")
+    plot.subplots_adjust(wspace =0, hspace =0.5)
     
     for i in xrange(_NUM_RECORDS):
-      # Run the network for a single iteration
         network1.run(1)
         anomalyScore1 = temporalPoolerRegion1.getOutputData("anomalyScore")[0]
         pre1_1 = sensorRegion1.getOutputData("sourceOut")[0]
         pre2_1 = sensorRegion1.getOutputData("sourceOut")[1]
         pre3_1 = sensorRegion1.getOutputData("sourceOut")[2]
-        
+        pepa_acc_plot_x.append(pre1_1)
+        pepa_acc_plot_y.append(pre2_1)
+        pepa_acc_plot_z.append(pre3_1)
+		
         network2.run(1)
         anomalyScore2 = temporalPoolerRegion2.getOutputData("anomalyScore")[0]
         pre1_2 = sensorRegion2.getOutputData("sourceOut")[0]
@@ -260,14 +280,8 @@ def runNetwork(network1, network2, network3, network4, date1, date2, date3, date
         
         average_anomalyScore = (anomalyScore1 + anomalyScore2 + anomalyScore3 + anomalyScore4) // 4
         
-#         if anomalyScore1 > 0.3 and anomalyScore2 > 0.3 and anomalyScore3 > 0.3 and anomalyScore4 > 0.3 and date1[i] == date2[i] and date2[i] == date3[i] and date3[i] == date4[i] and date4[i] == date1[i]:
-#             print "Date: ", date1[i], "  PEPA ACC:", anomalyScore1, "  PEPA QUA:", anomalyScore3, "  SALT ACC:", anomalyScore2, "  SALT QUA", anomalyScore4
-#             print "    --> PEPA_ACC: ", (pre1_1, pre2_1, pre3_1)
-#             print "        SALT_ACC: ", (pre1_2, pre2_2, pre3_2)
-#             print "        PEPA_QUA: ", (pre1_3, pre2_3, pre3_3, pre4_3)
-#             print "        SALT_QUA: ", (pre1_4, pre2_4, pre3_4, pre4_4)
-#             print "\n"
-
+        date.append(date1[i])
+		
         print "Date: ", date1[i], "  PEPA ACC:", anomalyScore1, "  PEPA QUA:", anomalyScore3, "  SALT ACC:", anomalyScore2, "  SALT QUA", anomalyScore4
         print "    --> PEPA_ACC: ", (pre1_1, pre2_1, pre3_1)
         print "        SALT_ACC: ", (pre1_2, pre2_2, pre3_2)
@@ -280,15 +294,36 @@ def runNetwork(network1, network2, network3, network4, date1, date2, date3, date
         else:
             print "        \033[1;41m DANGEROUS CONDITION \033[0m"
         print "\n"
-
-	time.sleep(5)
+        
+        plt_x, plt_y, plt_z, plt_date = plot_acc_data(pepa_acc_plot_x, pepa_acc_plot_y, pepa_acc_plot_z, date)
+        
+        ax1 = plot.add_subplot(311)
+        ax1.set_xticks([])
+        ax1.plot(plt_date, plt_x, "b--", linewidth=1)
+        ax1.set_title('PEPA_ACC_X')
+        
+        ax2 = plot.add_subplot(312)
+        ax2.set_xticks([])
+        ax2.plot(plt_date, plt_y, "r--", linewidth=1)
+        ax2.set_title('PEPA_ACC_Y')
+    
+        ax3 = plot.add_subplot(313)
+        ax3.set_xticks([])
+        ax3.plot(plt_date, plt_z, "g--", linewidth=1)
+        ax3.set_title('PEPA_ACC_Z')
+        
+        plot.show()
+        plt.pause(1e-17)
+        
+        time.sleep(3)
+        plot.clf()
 
 if __name__ == "__main__":
     
-    pepa_acc_file = '/media/tpc2/DATA/ProcessedLanceData/pepa_acc_timestep3.csv'
-    salt_acc_file = '/media/tpc2/DATA/ProcessedLanceData/salt_acc_timestep3.csv'
-    pepa_qua_file = '/media/tpc2/DATA/ProcessedLanceData/pepa_qua_timestep3.csv'
-    salt_qua_file = '/media/tpc2/DATA/ProcessedLanceData/salt_qua_timestep3.csv'
+    pepa_acc_file = 'D:\\HTM-AnomalyDetection\\data\\pepa_acc_timestep3.csv'
+    salt_acc_file = 'D:\\HTM-AnomalyDetection\\data\\salt_acc_timestep3.csv'
+    pepa_qua_file = 'D:\\HTM-AnomalyDetection\\data\\pepa_qua_timestep3.csv'
+    salt_qua_file = 'D:\\HTM-AnomalyDetection\\data\\salt_qua_timestep3.csv'
     
     scalarEncoder1Args = {
       "w": 21,
