@@ -226,6 +226,17 @@ def plot_acc_data(x, y, z, date, buffer_size=100):
         return new_x, new_y, new_z, new_date
     else:        
         return x, y, z, date
+    
+def plot_qua_data(w, x, y, z, date, buffer_size=100):
+    if len(w) > buffer_size and len(x) > buffer_size and len(y) > buffer_size and len(z) > buffer_size:
+        new_w = w[-buffer_size:]
+        new_x = x[-buffer_size:]
+        new_y = y[-buffer_size:]
+        new_z = z[-buffer_size:]
+        new_date = date[-buffer_size:]
+        return new_w, new_x, new_y, new_z, new_date
+    else:        
+        return w, x, y, z, date
 	  
 def runNetwork(network1, network2, network3, network4, date1, date2, date3, date4):
     sensorRegion1 = network1.regions["sensor"]
@@ -244,9 +255,21 @@ def runNetwork(network1, network2, network3, network4, date1, date2, date3, date
     pepa_acc_plot_x = []
     pepa_acc_plot_y = []
     pepa_acc_plot_z = []
+    salt_acc_plot_x = []
+    salt_acc_plot_y = []
+    salt_acc_plot_z = []    
+    pepa_qua_plot_w = []
+    pepa_qua_plot_x = []
+    pepa_qua_plot_y = []
+    pepa_qua_plot_z = []
+    salt_qua_plot_w = []
+    salt_qua_plot_x = []
+    salt_qua_plot_y = []
+    salt_qua_plot_z = []
 	
-    plot = plt.figure("Visulization")
-    plot.subplots_adjust(wspace =0, hspace =0.5)
+    plot = plt.figure("Visulization", figsize=(28, 6))
+    plot.subplots_adjust(wspace =1, hspace =0.5)
+    plot.subplots(ncols=2, nrows=3)
     
     for i in xrange(_NUM_RECORDS):
         network1.run(1)
@@ -263,6 +286,9 @@ def runNetwork(network1, network2, network3, network4, date1, date2, date3, date
         pre1_2 = sensorRegion2.getOutputData("sourceOut")[0]
         pre2_2 = sensorRegion2.getOutputData("sourceOut")[1]
         pre3_2 = sensorRegion2.getOutputData("sourceOut")[2]
+        salt_acc_plot_x.append(pre1_2)
+        salt_acc_plot_y.append(pre2_2)
+        salt_acc_plot_z.append(pre3_2)
         
         network3.run(1)
         anomalyScore3 = temporalPoolerRegion3.getOutputData("anomalyScore")[0]
@@ -270,6 +296,10 @@ def runNetwork(network1, network2, network3, network4, date1, date2, date3, date
         pre2_3 = sensorRegion3.getOutputData("sourceOut")[1]
         pre3_3 = sensorRegion3.getOutputData("sourceOut")[2]
         pre4_3 = sensorRegion3.getOutputData("sourceOut")[3]
+        pepa_qua_plot_w.append(pre1_3)
+        pepa_qua_plot_x.append(pre2_3)
+        pepa_qua_plot_y.append(pre3_3)
+        pepa_qua_plot_z.append(pre4_3)
         
         network4.run(1)
         anomalyScore4 = temporalPoolerRegion4.getOutputData("anomalyScore")[0]
@@ -277,6 +307,10 @@ def runNetwork(network1, network2, network3, network4, date1, date2, date3, date
         pre2_4 = sensorRegion4.getOutputData("sourceOut")[1]
         pre3_4 = sensorRegion4.getOutputData("sourceOut")[2]
         pre4_4 = sensorRegion4.getOutputData("sourceOut")[3]
+        salt_qua_plot_w.append(pre1_4)
+        salt_qua_plot_x.append(pre2_4)
+        salt_qua_plot_y.append(pre3_4)
+        salt_qua_plot_z.append(pre4_4)
         
         average_anomalyScore = (anomalyScore1 + anomalyScore2 + anomalyScore3 + anomalyScore4) // 4
         
@@ -295,22 +329,84 @@ def runNetwork(network1, network2, network3, network4, date1, date2, date3, date
             print "        \033[1;41m DANGEROUS CONDITION \033[0m"
         print "\n"
         
-        plt_x, plt_y, plt_z, plt_date = plot_acc_data(pepa_acc_plot_x, pepa_acc_plot_y, pepa_acc_plot_z, date)
-        
-        ax1 = plot.add_subplot(311)
+        plt_pepa_acc_x, plt_pepa_acc_y, plt_pepa_acc_z, plt_date_pepa_acc = plot_acc_data(pepa_acc_plot_x, pepa_acc_plot_y, pepa_acc_plot_z, date)
+        plt_salt_acc_x, plt_salt_acc_y, plt_salt_acc_z, plt_date_salt_acc = plot_acc_data(salt_acc_plot_x, salt_acc_plot_y, salt_acc_plot_z, date)
+        plt_pepa_qua_w, plt_pepa_qua_x, plt_pepa_qua_y, plt_pepa_qua_z, plt_date_pepa_qua = plot_qua_data(pepa_qua_plot_w, pepa_qua_plot_x, pepa_qua_plot_y, pepa_qua_plot_z, date)
+        plt_salt_qua_w, plt_salt_qua_x, plt_salt_qua_y, plt_salt_qua_z, plt_date_salt_qua = plot_qua_data(salt_qua_plot_w, salt_qua_plot_x, salt_qua_plot_y, salt_qua_plot_z, date)
+
+        # pepa acc plot
+        ax1 = plot.add_subplot(4,4,1)
         ax1.set_xticks([])
-        ax1.plot(plt_date, plt_x, "b--", linewidth=1)
+        ax1.plot(plt_date_pepa_acc, plt_pepa_acc_x, "b--", linewidth=1)
         ax1.set_title('PEPA_ACC_X')
         
-        ax2 = plot.add_subplot(312)
+        ax2 = plot.add_subplot(4,4,5)
         ax2.set_xticks([])
-        ax2.plot(plt_date, plt_y, "r--", linewidth=1)
+        ax2.plot(plt_date_pepa_acc, plt_pepa_acc_y, "b--", linewidth=1)
         ax2.set_title('PEPA_ACC_Y')
     
-        ax3 = plot.add_subplot(313)
+        ax3 = plot.add_subplot(4,4,9)
         ax3.set_xticks([])
-        ax3.plot(plt_date, plt_z, "g--", linewidth=1)
+        ax3.plot(plt_date_pepa_acc, plt_pepa_acc_z, "b--", linewidth=1)
         ax3.set_title('PEPA_ACC_Z')
+        
+        # salt acc plot
+        ax4 = plot.add_subplot(4,4,2)
+        ax4.set_xticks([])
+        ax4.plot(plt_date_salt_acc, plt_salt_acc_x, "b--", linewidth=1)
+        ax4.set_title('SALT_ACC_X')
+        
+        ax5 = plot.add_subplot(4,4,6)
+        ax5.set_xticks([])
+        ax5.plot(plt_date_salt_acc, plt_salt_acc_y, "b--", linewidth=1)
+        ax5.set_title('SALT_ACC_Y')
+    
+        ax6 = plot.add_subplot(4,4,10)
+        ax6.set_xticks([])
+        ax6.plot(plt_date_salt_acc, plt_salt_acc_z, "b--", linewidth=1)
+        ax6.set_title('SALT_ACC_Z')
+        
+        # pepa qua plot
+        ax7 = plot.add_subplot(4,4,3)
+        ax7.set_xticks([])
+        ax7.plot(plt_date_pepa_qua, plt_pepa_qua_w, "b--", linewidth=1)
+        ax7.set_title('PEPA_QUA_W')
+        
+        ax8 = plot.add_subplot(4,4,7)
+        ax8.set_xticks([])
+        ax8.plot(plt_date_pepa_qua, plt_pepa_qua_x, "b--", linewidth=1)
+        ax8.set_title('PEPA_QUA_X')
+    
+        ax9 = plot.add_subplot(4,4,11)
+        ax9.set_xticks([])
+        ax9.plot(plt_date_pepa_qua, plt_pepa_qua_y, "b--", linewidth=1)
+        ax9.set_title('PEPA_QUA_Y')
+
+        ax10 = plot.add_subplot(4,4,15)
+        ax10.set_xticks([])
+        ax10.plot(plt_date_pepa_qua, plt_pepa_qua_z, "b--", linewidth=1)
+        ax10.set_title('PEPA_QUA_Z')
+        
+        # salt qua plot
+        ax11 = plot.add_subplot(4,4,4)
+        ax11.set_xticks([])
+        ax11.plot(plt_date_salt_qua, plt_salt_qua_w, "b--", linewidth=1)
+        ax11.set_title('SALT_QUA_W')
+        
+        ax12 = plot.add_subplot(4,4,8)
+        ax12.set_xticks([])
+        ax12.plot(plt_date_salt_qua, plt_salt_qua_w, "b--", linewidth=1)
+        ax12.set_title('SALT_QUA_X')
+    
+        ax13 = plot.add_subplot(4,4,12)
+        ax13.set_xticks([])
+        ax13.plot(plt_date_salt_qua, plt_salt_qua_y, "b--", linewidth=1)
+        ax13.set_title('SALT_QUA_Y')
+
+        ax14 = plot.add_subplot(4,4,16)
+        ax14.set_xticks([])
+        ax14.plot(plt_date_salt_qua, plt_salt_qua_w, "b--", linewidth=1)
+        ax14.set_title('SALT_QUA_Z')
         
         plot.show()
         plt.pause(1e-17)
