@@ -12,4 +12,6 @@ This repository only contains the code snippet and data that used by NuPic to sh
 
 Currently we only do the experiments on motion data, and the HTM model will detect the anomaly point by using four different sensors' incoming data streams.
 
+![motion2](https://github.com/KimMeen/HTM-AnomalyDetection/blob/master/docs/Screenshot2.png)
+
 ![motion](https://github.com/KimMeen/HTM-AnomalyDetection/blob/master/docs/Screenshot1.png)
