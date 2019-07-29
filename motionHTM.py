@@ -7,6 +7,8 @@ import csv
 from itertools import islice
 import json
 import time
+from datetime import datetime
+import numpy as np
 
 from nupic.data.file_record_stream import FileRecordStream
 from nupic.engine import Network
@@ -204,6 +206,14 @@ def createTemporalAnomaly_qua(recordParams, spatialParams=_SP_PARAMS,
 
     return network
 
+def mean(numbers):
+    return float(sum(numbers)) / max(len(numbers), 1)
+
+def seconds_difference(date_str1, date_str2):
+    date1 = datetime.strptime(date_str1, '%Y-%m-%d %H:%M:%S')
+    date2 = datetime.strptime(date_str2, '%Y-%m-%d %H:%M:%S')
+    return float((date2 - date1).total_seconds())
+
 def getDate(recordParams, total = _NUM_RECORDS):
     inputFilePath = recordParams["inputFilePath"]
     date = []
@@ -266,7 +276,11 @@ def runNetwork(network1, network2, network3, network4, date1, date2, date3, date
     salt_qua_plot_x = []
     salt_qua_plot_y = []
     salt_qua_plot_z = []
-	
+    
+    table_content = [[' ', ' ', ' '],[' ', ' ', ' '],[' ', ' ', ' '],[' ', ' ', ' ']]
+    previous_result = 'G'
+    contineous_flag = False
+
     plot = plt.figure("Visulization", figsize=(28, 6))
     plot.subplots_adjust(wspace =1, hspace =0.5)
     plot.subplots(ncols=2, nrows=3)
@@ -289,7 +303,7 @@ def runNetwork(network1, network2, network3, network4, date1, date2, date3, date
         salt_acc_plot_x.append(pre1_2)
         salt_acc_plot_y.append(pre2_2)
         salt_acc_plot_z.append(pre3_2)
-        
+
         network3.run(1)
         anomalyScore3 = temporalPoolerRegion3.getOutputData("anomalyScore")[0]
         pre1_3 = sensorRegion3.getOutputData("sourceOut")[0]
@@ -312,10 +326,10 @@ def runNetwork(network1, network2, network3, network4, date1, date2, date3, date
         salt_qua_plot_y.append(pre3_4)
         salt_qua_plot_z.append(pre4_4)
         
-        average_anomalyScore = (anomalyScore1 + anomalyScore2 + anomalyScore3 + anomalyScore4) // 4
+        average_anomalyScore = mean([anomalyScore1, anomalyScore2, anomalyScore3, anomalyScore4])
         
         date.append(date1[i])
-		
+        		
         print "Date: ", date1[i], "  PEPA ACC:", anomalyScore1, "  PEPA QUA:", anomalyScore3, "  SALT ACC:", anomalyScore2, "  SALT QUA", anomalyScore4
         print "    --> PEPA_ACC: ", (pre1_1, pre2_1, pre3_1)
         print "        SALT_ACC: ", (pre1_2, pre2_2, pre3_2)
@@ -323,10 +337,66 @@ def runNetwork(network1, network2, network3, network4, date1, date2, date3, date
         print "        SALT_QUA: ", (pre1_4, pre2_4, pre3_4, pre4_4)
         if average_anomalyScore < 0.3:
             print "        \033[1;42m GOOD CONDITION \033[0m"
+            previous_result = 'G'
         elif average_anomalyScore > 0.3 and average_anomalyScore < 0.5:
-            print "        \033[1;43m WARNING \033[0m"
+            print "        \033[1;43m WARNING CAUTION \033[0m"
+            previous_result = 'W'
         else:
+            if previous_result == 'D':
+                contineous_flag = True
+            else:
+                contineous_flag = False
+
+            if table_content[0][0] == ' ' and contineous_flag == False:
+                table_content[0][0] = date1[i]
+                table_content[0][1] = average_anomalyScore
+                table_content[0][2] = float(0)
+            elif table_content[1][0] == ' ' and contineous_flag == False:
+                table_content[1][0] = date1[i]
+                table_content[1][1] = average_anomalyScore
+                table_content[1][2] = float(0)
+            elif table_content[2][0] == ' ' and contineous_flag == False:
+                table_content[2][0] = date1[i]
+                table_content[2][1] = average_anomalyScore
+                table_content[2][2] = float(0)
+            elif table_content[3][0] == ' ' and contineous_flag == False:
+                table_content[3][0] = date1[i]
+                table_content[3][1] = average_anomalyScore
+                table_content[3][2] = float(0)         
+            elif table_content[1][0] == ' ' and contineous_flag == True:
+                table_content[0][0] = date1[i]
+                table_content[0][1] = average_anomalyScore
+                table_content[0][2] += seconds_difference(date1[i-1], date1[i])
+            elif table_content[2][0] == ' ' and contineous_flag == True:
+                table_content[1][0] = date1[i]
+                table_content[1][1] = average_anomalyScore
+                table_content[1][2] += seconds_difference(date1[i-1], date1[i])
+            elif table_content[3][0] == ' ' and contineous_flag == True:
+                table_content[2][0] = date1[i]
+                table_content[2][1] = average_anomalyScore
+                table_content[2][2] += seconds_difference(date1[i-1], date1[i])
+            elif table_content[0][0] != ' ' and table_content[1][0] != ' ' and table_content[2][0] != ' ' and table_content[3][0] != ' ' and contineous_flag == False:
+                table_content[0][0] = table_content[1][0]
+                table_content[0][1] = table_content[1][1]
+                table_content[0][2] = table_content[1][2]
+                
+                table_content[1][0] = table_content[2][0]
+                table_content[1][1] = table_content[2][1]
+                table_content[1][2] = table_content[2][2]
+                
+                table_content[2][0] = table_content[3][0]
+                table_content[2][1] = table_content[3][1]
+                table_content[2][2] = table_content[3][2]
+                
+                table_content[3][0] = date1[i]
+                table_content[3][1] = average_anomalyScore
+                table_content[3][2] = 0
+            elif table_content[0][0] != ' ' and table_content[1][0] != ' ' and table_content[2][0] != ' ' and table_content[3][0] != ' ' and contineous_flag == True:                
+                table_content[3][0] = date1[i]
+                table_content[3][1] = average_anomalyScore
+                table_content[3][2] += seconds_difference(date1[i-1], date1[i])   
             print "        \033[1;41m DANGEROUS CONDITION \033[0m"
+            previous_result = 'D'
         print "\n"
         
         plt_pepa_acc_x, plt_pepa_acc_y, plt_pepa_acc_z, plt_date_pepa_acc = plot_acc_data(pepa_acc_plot_x, pepa_acc_plot_y, pepa_acc_plot_z, date)
@@ -408,6 +478,17 @@ def runNetwork(network1, network2, network3, network4, date1, date2, date3, date
         ax14.plot(plt_date_salt_qua, plt_salt_qua_w, "b--", linewidth=1)
         ax14.set_title('SALT_QUA_Z')
         
+        # table has been defined here
+        ax15 = plot.add_subplot(4,4,13)
+        table = ax15.table(
+                cellText=table_content,
+                cellLoc = 'center',
+                colLabels = ['Date', 'Avg_anomalyScore', 'Last for'],
+                bbox=[0, -0.55, 3, 1.8]
+                )
+        table.scale(4, 4)
+        ax15.axis("off")  
+        
         plot.show()
         plt.pause(1e-17)
         
@@ -416,10 +497,10 @@ def runNetwork(network1, network2, network3, network4, date1, date2, date3, date
 
 if __name__ == "__main__":
     
-    pepa_acc_file = 'D:\\HTM-AnomalyDetection\\data\\pepa_acc_timestep3.csv'
-    salt_acc_file = 'D:\\HTM-AnomalyDetection\\data\\salt_acc_timestep3.csv'
-    pepa_qua_file = 'D:\\HTM-AnomalyDetection\\data\\pepa_qua_timestep3.csv'
-    salt_qua_file = 'D:\\HTM-AnomalyDetection\\data\\salt_qua_timestep3.csv'
+    pepa_acc_file = '/media/tpc2/DATA/ProcessedLanceData/pepa_acc_timestep3_fake.csv'
+    salt_acc_file = '/media/tpc2/DATA/ProcessedLanceData/salt_acc_timestep3_fake.csv'
+    pepa_qua_file = '/media/tpc2/DATA/ProcessedLanceData/pepa_qua_timestep3_fake.csv'
+    salt_qua_file = '/media/tpc2/DATA/ProcessedLanceData/salt_qua_timestep3_fake.csv'
     
     scalarEncoder1Args = {
       "w": 21,
