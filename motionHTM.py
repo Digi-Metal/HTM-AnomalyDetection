@@ -281,7 +281,7 @@ def runNetwork(network1, network2, network3, network4, date1, date2, date3, date
     previous_result = 'G'
     contineous_flag = False
 
-    plot = plt.figure("Visulization", figsize=(28, 6))
+    plot = plt.figure("Outotec Motion Anomaly Detection", figsize=(28, 6))
     plot.subplots_adjust(wspace =1, hspace =0.5)
     plot.subplots(ncols=2, nrows=3)
     
@@ -483,7 +483,7 @@ def runNetwork(network1, network2, network3, network4, date1, date2, date3, date
         table = ax15.table(
                 cellText=table_content,
                 cellLoc = 'center',
-                colLabels = ['Date', 'Avg_anomalyScore', 'Last for'],
+                colLabels = ['Date', 'Avg_anomalyScore', 'Last for (in seconds)'],
                 bbox=[0, -0.55, 3, 1.8]
                 )
         table.scale(4, 4)
@@ -497,10 +497,10 @@ def runNetwork(network1, network2, network3, network4, date1, date2, date3, date
 
 if __name__ == "__main__":
     
-    pepa_acc_file = '/media/tpc2/DATA/ProcessedLanceData/pepa_acc_timestep3_fake.csv'
-    salt_acc_file = '/media/tpc2/DATA/ProcessedLanceData/salt_acc_timestep3_fake.csv'
-    pepa_qua_file = '/media/tpc2/DATA/ProcessedLanceData/pepa_qua_timestep3_fake.csv'
-    salt_qua_file = '/media/tpc2/DATA/ProcessedLanceData/salt_qua_timestep3_fake.csv'
+    pepa_acc_file = '/media/tpc2/DATA/ProcessedLanceData/pepa_acc_timestep3.csv'
+    salt_acc_file = '/media/tpc2/DATA/ProcessedLanceData/salt_acc_timestep3.csv'
+    pepa_qua_file = '/media/tpc2/DATA/ProcessedLanceData/pepa_qua_timestep3.csv'
+    salt_qua_file = '/media/tpc2/DATA/ProcessedLanceData/salt_qua_timestep3.csv'
     
     scalarEncoder1Args = {
       "w": 21,
