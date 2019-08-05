@@ -14,52 +14,8 @@ from nupic.data.file_record_stream import FileRecordStream
 from nupic.engine import Network
 from nupic.encoders import MultiEncoder, ScalarEncoder, DateEncoder
 
-# Global parameters
-_VERBOSITY = 0
-_NUM_RECORDS = 153501
 
-# Default config fields for SPRegion
-_SP_PARAMS = {
-    "spVerbosity": _VERBOSITY,
-    "spatialImp": "cpp",
-    "globalInhibition": 1,
-    "columnCount": 2048,
-    "inputWidth": 0,
-    "numActiveColumnsPerInhArea": 40,
-    "seed": 1956,
-    "potentialPct": 0.8,
-    "synPermConnected": 0.1,
-    "synPermActiveInc": 0.0001,
-    "synPermInactiveDec": 0.0005,
-    "boostStrength": 0.0,
-}
-
-# Default config fields for TPRegion
-_TM_PARAMS = {
-    "verbosity": _VERBOSITY,
-    "columnCount": 2048,
-    "cellsPerColumn": 32,
-    "inputWidth": 2048,
-    "seed": 1960,
-    "temporalImp": "cpp",
-    "newSynapseCount": 20,
-    "maxSynapsesPerSegment": 32,
-    "maxSegmentsPerCell": 128,
-    "initialPerm": 0.21,
-    "permanenceInc": 0.1,
-    "permanenceDec": 0.1,
-    "globalDecay": 0.0,
-    "maxAge": 0,
-    "minThreshold": 9,
-    "activationThreshold": 12,
-    "outputType": "normal",
-    "pamLength": 3,
-}
-
-
-def createTemporalAnomaly_acc(recordParams, spatialParams=_SP_PARAMS,
-                              temporalParams=_TM_PARAMS,
-                              verbosity=_VERBOSITY):
+def createTemporalAnomaly_acc(recordParams, spatialParams, temporalParams, verbosity):
 
     inputFilePath = recordParams["inputFilePath"]
     scalarEncoder1Args = recordParams["scalarEncoder1Args"]
@@ -130,9 +86,8 @@ def createTemporalAnomaly_acc(recordParams, spatialParams=_SP_PARAMS,
 
     return network
 
-def createTemporalAnomaly_qua(recordParams, spatialParams=_SP_PARAMS,
-                              temporalParams=_TM_PARAMS,
-                              verbosity=_VERBOSITY):
+
+def createTemporalAnomaly_qua(recordParams, spatialParams, temporalParams, verbosity):
 
     inputFilePath = recordParams["inputFilePath"]
     scalarEncoder1Args = recordParams["scalarEncoder1Args"]
@@ -206,15 +161,18 @@ def createTemporalAnomaly_qua(recordParams, spatialParams=_SP_PARAMS,
 
     return network
 
+
 def mean(numbers):
     return float(sum(numbers)) / max(len(numbers), 1)
+
 
 def seconds_difference(date_str1, date_str2):
     date1 = datetime.strptime(date_str1, '%Y-%m-%d %H:%M:%S')
     date2 = datetime.strptime(date_str2, '%Y-%m-%d %H:%M:%S')
     return float((date2 - date1).total_seconds())
 
-def getDate(recordParams, total = _NUM_RECORDS):
+
+def getDate(recordParams, total):
     inputFilePath = recordParams["inputFilePath"]
     date = []
     with open(inputFilePath) as fin:
@@ -227,6 +185,7 @@ def getDate(recordParams, total = _NUM_RECORDS):
             date.append(Record_in_Dict["time"])
     return date
 
+
 def plot_acc_data(x, y, z, date, buffer_size=100):
     if len(x) > buffer_size and len(y) > buffer_size and len(z) > buffer_size:
         new_x = x[-buffer_size:]
@@ -236,6 +195,7 @@ def plot_acc_data(x, y, z, date, buffer_size=100):
         return new_x, new_y, new_z, new_date
     else:        
         return x, y, z, date
+
     
 def plot_qua_data(w, x, y, z, date, buffer_size=100):
     if len(w) > buffer_size and len(x) > buffer_size and len(y) > buffer_size and len(z) > buffer_size:
@@ -247,6 +207,7 @@ def plot_qua_data(w, x, y, z, date, buffer_size=100):
         return new_w, new_x, new_y, new_z, new_date
     else:        
         return w, x, y, z, date
+
 	  
 def runNetwork(network1, network2, network3, network4, date1, date2, date3, date4):
     sensorRegion1 = network1.regions["sensor"]
@@ -495,13 +456,64 @@ def runNetwork(network1, network2, network3, network4, date1, date2, date3, date
         time.sleep(1)
         plot.clf()
 
+
 if __name__ == "__main__":
     
+    # Simulation data
     pepa_acc_file = '/media/tpc2/DATA/ProcessedLanceData/pepa_acc_timestep3.csv'
     salt_acc_file = '/media/tpc2/DATA/ProcessedLanceData/salt_acc_timestep3.csv'
     pepa_qua_file = '/media/tpc2/DATA/ProcessedLanceData/pepa_qua_timestep3.csv'
     salt_qua_file = '/media/tpc2/DATA/ProcessedLanceData/salt_qua_timestep3.csv'
     
+    # Global parameters
+    _VERBOSITY = 0
+    _NUM_RECORDS = 153501
+    
+    # -------------------------------------------------------------------------
+    #
+    #
+    # Default config fields for SPRegion
+    _SP_PARAMS = {
+        "spVerbosity": _VERBOSITY,
+        "spatialImp": "cpp",
+        "globalInhibition": 1,
+        "columnCount": 2048,
+        "inputWidth": 0,
+        "numActiveColumnsPerInhArea": 40,
+        "seed": 1956,
+        "potentialPct": 0.8,
+        "synPermConnected": 0.1,
+        "synPermActiveInc": 0.0001,
+        "synPermInactiveDec": 0.0005,
+        "boostStrength": 0.0,
+    }
+    
+    # Default config fields for TPRegion
+    _TM_PARAMS = {
+        "verbosity": _VERBOSITY,
+        "columnCount": 2048,
+        "cellsPerColumn": 32,
+        "inputWidth": 2048,
+        "seed": 1960,
+        "temporalImp": "cpp",
+        "newSynapseCount": 20,
+        "maxSynapsesPerSegment": 32,
+        "maxSegmentsPerCell": 128,
+        "initialPerm": 0.21,
+        "permanenceInc": 0.1,
+        "permanenceDec": 0.1,
+        "globalDecay": 0.0,
+        "maxAge": 0,
+        "minThreshold": 9,
+        "activationThreshold": 12,
+        "outputType": "normal",
+        "pamLength": 3,
+    }
+    
+    #--------------------------------------------------------------------------
+    #
+    #
+    # The encoder fields for inputs
     scalarEncoder1Args = {
       "w": 21,
       "minval": 0.97 - 0.03,
@@ -776,10 +788,14 @@ if __name__ == "__main__":
       "dateEncoderArgs": dateEncoderArgs,
     }
     
-    pepa_acc_network = createTemporalAnomaly_acc(pepa_acc_recordParams)
-    salt_acc_network = createTemporalAnomaly_acc(salt_acc_recordParams)
-    pepa_qua_network = createTemporalAnomaly_qua(pepa_qua_recordParams)
-    salt_qua_network = createTemporalAnomaly_qua(salt_qua_recordParams)
+    #--------------------------------------------------------------------------
+    #
+    #
+    # Generate networks and run them
+    pepa_acc_network = createTemporalAnomaly_acc(pepa_acc_recordParams, spatialParams=_SP_PARAMS, temporalParams=_TM_PARAMS, verbosity=_VERBOSITY)
+    salt_acc_network = createTemporalAnomaly_acc(salt_acc_recordParams, spatialParams=_SP_PARAMS, temporalParams=_TM_PARAMS, verbosity=_VERBOSITY)
+    pepa_qua_network = createTemporalAnomaly_qua(pepa_qua_recordParams, spatialParams=_SP_PARAMS, temporalParams=_TM_PARAMS, verbosity=_VERBOSITY)
+    salt_qua_network = createTemporalAnomaly_qua(salt_qua_recordParams, spatialParams=_SP_PARAMS, temporalParams=_TM_PARAMS, verbosity=_VERBOSITY)
 
     pepa_acc_date = getDate(pepa_acc_recordParams, _NUM_RECORDS)
     salt_acc_date = getDate(salt_acc_recordParams, _NUM_RECORDS)
