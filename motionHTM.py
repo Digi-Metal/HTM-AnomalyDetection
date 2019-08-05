@@ -465,7 +465,7 @@ def runNetwork(network1, network2, network3, network4, date1, date2, date3, date
         
         ax12 = plot.add_subplot(4,4,8)
         ax12.set_xticks([])
-        ax12.plot(plt_date_salt_qua, plt_salt_qua_w, "b--", linewidth=1)
+        ax12.plot(plt_date_salt_qua, plt_salt_qua_x, "b--", linewidth=1)
         ax12.set_title('SALT_QUA_X')
     
         ax13 = plot.add_subplot(4,4,12)
@@ -475,7 +475,7 @@ def runNetwork(network1, network2, network3, network4, date1, date2, date3, date
 
         ax14 = plot.add_subplot(4,4,16)
         ax14.set_xticks([])
-        ax14.plot(plt_date_salt_qua, plt_salt_qua_w, "b--", linewidth=1)
+        ax14.plot(plt_date_salt_qua, plt_salt_qua_z, "b--", linewidth=1)
         ax14.set_title('SALT_QUA_Z')
         
         # table has been defined here
@@ -483,7 +483,7 @@ def runNetwork(network1, network2, network3, network4, date1, date2, date3, date
         table = ax15.table(
                 cellText=table_content,
                 cellLoc = 'center',
-                colLabels = ['Date', 'Avg_anomalyScore', 'Last for (in seconds)'],
+                colLabels = ['Date', 'Average anomaly score', 'Duration (seconds)'],
                 bbox=[0, -0.55, 3, 1.8]
                 )
         table.scale(4, 4)
@@ -504,8 +504,8 @@ if __name__ == "__main__":
     
     scalarEncoder1Args = {
       "w": 21,
-      "minval": 0.9,
-      "maxval": 1.0,
+      "minval": 0.97 - 0.03,
+      "maxval": 0.97 + 0.03,
       "periodic": False,
       "n": 50,
       "radius": 0,
@@ -518,8 +518,8 @@ if __name__ == "__main__":
     
     scalarEncoder2Args = {
       "w": 21,
-      "minval": -0.1,
-      "maxval": 0.1,
+      "minval": -0.002 - 0.005,
+      "maxval": -0.002 + 0.005,
       "periodic": False,
       "n": 50,
       "radius": 0,
@@ -532,8 +532,8 @@ if __name__ == "__main__":
 
     scalarEncoder3Args = {
       "w": 21,
-      "minval": -0.1,
-      "maxval": 0.1,
+      "minval": -0.012 - 0.005,
+      "maxval": -0.012 + 0.005,
       "periodic": False,
       "n": 50,
       "radius": 0,
@@ -565,8 +565,8 @@ if __name__ == "__main__":
 
     scalarEncoder1Args = {
       "w": 21,
-      "minval": 0.9,
-      "maxval": 1.0,
+      "minval": 0.96 - 0.03,
+      "maxval": 0.96 + 0.03,
       "periodic": False,
       "n": 50,
       "radius": 0,
@@ -579,8 +579,8 @@ if __name__ == "__main__":
     
     scalarEncoder2Args = {
       "w": 21,
-      "minval": -0.1,
-      "maxval": 0.1,
+      "minval": 0.050 - 0.010,
+      "maxval": 0.050 + 0.010,
       "periodic": False,
       "n": 50,
       "radius": 0,
@@ -593,8 +593,8 @@ if __name__ == "__main__":
 
     scalarEncoder3Args = {
       "w": 21,
-      "minval": -0.1,
-      "maxval": 0.1,
+      "minval": 0.025 - 0.010,
+      "maxval": 0.025 + 0.010,
       "periodic": False,
       "n": 50,
       "radius": 0,
@@ -626,8 +626,8 @@ if __name__ == "__main__":
     
     scalarEncoder1Args = {
       "w": 21,
-      "minval": -0.8,
-      "maxval": -0.2,
+      "minval": -0.48 - 0.05,
+      "maxval": -0.48 + 0.05,
       "periodic": False,
       "n": 50,
       "radius": 0,
@@ -640,8 +640,8 @@ if __name__ == "__main__":
     
     scalarEncoder2Args = {
       "w": 21,
-      "minval": 0.2,
-      "maxval": 0.8,
+      "minval": 0.51 - 0.05,
+      "maxval": 0.51 + 0.05,
       "periodic": False,
       "n": 50,
       "radius": 0,
@@ -654,8 +654,8 @@ if __name__ == "__main__":
 
     scalarEncoder3Args = {
       "w": 21,
-      "minval": -0.8,
-      "maxval": -0.2,
+      "minval": -0.49 - 0.05,
+      "maxval": -0.49 + 0.05,
       "periodic": False,
       "n": 50,
       "radius": 0,
@@ -668,8 +668,8 @@ if __name__ == "__main__":
     
     scalarEncoder4Args = {
       "w": 21,
-      "minval": 0.2,
-      "maxval": 0.8,
+      "minval": 0.50 - 0.05,
+      "maxval": 0.50 + 0.05,
       "periodic": False,
       "n": 50,
       "radius": 0,
@@ -702,8 +702,8 @@ if __name__ == "__main__":
     
     scalarEncoder1Args = {
       "w": 21,
-      "minval": 0.2,
-      "maxval": 0.8,
+      "minval": 0.43 - 0.05,
+      "maxval": 0.43 + 0.05,
       "periodic": False,
       "n": 50,
       "radius": 0,
@@ -716,8 +716,8 @@ if __name__ == "__main__":
     
     scalarEncoder2Args = {
       "w": 21,
-      "minval": -0.8,
-      "maxval": -0.3,
+      "minval": -0.57 - 0.05,
+      "maxval": -0.57 + 0.05,
       "periodic": False,
       "n": 50,
       "radius": 0,
@@ -730,8 +730,8 @@ if __name__ == "__main__":
 
     scalarEncoder3Args = {
       "w": 21,
-      "minval": 0.2,
-      "maxval": 0.8,
+      "minval": 0.39 - 0.05,
+      "maxval": 0.39 + 0.05,
       "periodic": False,
       "n": 50,
       "radius": 0,
@@ -744,8 +744,8 @@ if __name__ == "__main__":
     
     scalarEncoder4Args = {
       "w": 21,
-      "minval": -0.8,
-      "maxval": -0.3,
+      "minval": -0.56 - 0.05,
+      "maxval": -0.56 + 0.05,
       "periodic": False,
       "n": 50,
       "radius": 0,
