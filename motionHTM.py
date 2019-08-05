@@ -492,7 +492,7 @@ def runNetwork(network1, network2, network3, network4, date1, date2, date3, date
         plot.show()
         plt.pause(1e-17)
         
-        time.sleep(3)
+        time.sleep(1)
         plot.clf()
 
 if __name__ == "__main__":
