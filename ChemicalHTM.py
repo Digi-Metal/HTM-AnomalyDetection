@@ -21,6 +21,7 @@ def createTemporalAnomaly_chemical(recordParams, spatialParams, temporalParams, 
     scalarEncoder4Args = recordParams["scalarEncoder4Args"]
     scalarEncoder5Args = recordParams["scalarEncoder5Args"]
     scalarEncoder6Args = recordParams["scalarEncoder6Args"]
+    scalarEncoder7Args = recordParams["scalarEncoder7Args"]
     dateEncoderArgs = recordParams["dateEncoderArgs"]
 
     scalarEncoder1 = ScalarEncoder(**scalarEncoder1Args)
@@ -29,6 +30,7 @@ def createTemporalAnomaly_chemical(recordParams, spatialParams, temporalParams, 
     scalarEncoder4 = ScalarEncoder(**scalarEncoder4Args)
     scalarEncoder5 = ScalarEncoder(**scalarEncoder5Args)
     scalarEncoder6 = ScalarEncoder(**scalarEncoder6Args)
+    scalarEncoder7 = ScalarEncoder(**scalarEncoder7Args)    
     dateEncoder = DateEncoder(**dateEncoderArgs)
 
     encoder = MultiEncoder()
@@ -38,6 +40,7 @@ def createTemporalAnomaly_chemical(recordParams, spatialParams, temporalParams, 
     encoder.addEncoder(scalarEncoder4Args["name"], scalarEncoder4)
     encoder.addEncoder(scalarEncoder5Args["name"], scalarEncoder5)
     encoder.addEncoder(scalarEncoder6Args["name"], scalarEncoder6)
+    encoder.addEncoder(scalarEncoder7Args["name"], scalarEncoder7)
     encoder.addEncoder(dateEncoderArgs["name"], dateEncoder)
 
     network = Network()
@@ -124,8 +127,9 @@ def getDate(recordParams, total):
     return date
 
 
-def plot_chemical_data(CaO, Fe_SiO2, Cu_Slag, Cu_Matte, Fe, SiO2, date, buffer_size=800):
-    if len(CaO) > buffer_size and len(Fe_SiO2) > buffer_size and len(Cu_Slag) > buffer_size and len(Cu_Matte) > buffer_size and len(Fe) > buffer_size and len(SiO2) > buffer_size:
+def plot_chemical_data(Bath_T, CaO, Fe_SiO2, Cu_Slag, Cu_Matte, Fe, SiO2, date, buffer_size=800):
+    if len(Bath_T) > buffer_size and len(CaO) > buffer_size and len(Fe_SiO2) > buffer_size and len(Cu_Slag) > buffer_size and len(Cu_Matte) > buffer_size and len(Fe) > buffer_size and len(SiO2) > buffer_size:
+        new_Bath_T = Bath_T[-buffer_size:]        
         new_CaO = CaO[-buffer_size:]
         new_Fe_SiO2 = Fe_SiO2[-buffer_size:]
         new_Cu_Slag = Cu_Slag[-buffer_size:]
@@ -141,7 +145,7 @@ def plot_chemical_data(CaO, Fe_SiO2, Cu_Slag, Cu_Matte, Fe, SiO2, date, buffer_s
 #        new_Fe = get_round(new_Fe, 5)
 #        new_SiO2 = get_round(new_SiO2, 5)
         
-        return new_CaO, new_Fe_SiO2, new_Cu_Slag, new_Cu_Matte, new_Fe, new_SiO2, new_date
+        return new_Bath_T, new_CaO, new_Fe_SiO2, new_Cu_Slag, new_Cu_Matte, new_Fe, new_SiO2, new_date
     else:
 #        CaO = get_round(CaO, 5)
 #        Fe_SiO2 = get_round(Fe_SiO2, 5)
@@ -149,19 +153,20 @@ def plot_chemical_data(CaO, Fe_SiO2, Cu_Slag, Cu_Matte, Fe, SiO2, date, buffer_s
 #        Cu_Matte = get_round(Cu_Matte, 5)
 #        Fe = get_round(Fe, 5)
 #        SiO2 = get_round(SiO2, 5)
-        return CaO, Fe_SiO2, Cu_Slag, Cu_Matte, Fe, SiO2, date
+        return Bath_T, CaO, Fe_SiO2, Cu_Slag, Cu_Matte, Fe, SiO2, date
 
     
-def plot_input_data(lance_air, lance_oxy, silica_flux, lime_flux, date, buffer_size=800):
-    if len(lance_air) > buffer_size and len(lance_oxy) > buffer_size and len(silica_flux) > buffer_size and len(lime_flux) > buffer_size:
+def plot_input_data(lance_air, lance_oxy, silica_flux, lime_flux, use_anomalies, date, buffer_size=800):
+    if len(lance_air) > buffer_size and len(lance_oxy) > buffer_size and len(silica_flux) > buffer_size and len(lime_flux) > buffer_size and len(use_anomalies) > buffer_size:
         new_lance_air = lance_air[-buffer_size:]
         new_lance_oxy = lance_oxy[-buffer_size:]
         new_silica_flux = silica_flux[-buffer_size:]
         new_lime_flux = lime_flux[-buffer_size:]
+        new_use_anomalies = use_anomalies[-buffer_size:]
         new_date = date[-buffer_size:]
-        return new_lance_air, new_lance_oxy, new_silica_flux, new_lime_flux, new_date
+        return new_lance_air, new_lance_oxy, new_silica_flux, new_lime_flux, new_use_anomalies, new_date
     else:        
-        return lance_air, lance_oxy, silica_flux, lime_flux, date
+        return lance_air, lance_oxy, silica_flux, lime_flux, use_anomalies, date
     
     
 def runNetwork(network, date1, input_data_file):
@@ -170,6 +175,7 @@ def runNetwork(network, date1, input_data_file):
 
     # output data
     date = []
+    Bath_T = []
     CaO = []
     Fe_SiO2 = []
     Cu_Slag = []
@@ -182,11 +188,13 @@ def runNetwork(network, date1, input_data_file):
     lance_oxy = []
     silica_flux = []
     lime_flux = []
+    use_anomalies = []
     
     plt_lance_air = []
     plt_lance_oxy = []
     plt_silica_flux = []
     plt_lime_flux = []
+    plt_use_anomalies = []
     
     # initial input data to display
     with open(input_data_file) as fin:
@@ -200,6 +208,7 @@ def runNetwork(network, date1, input_data_file):
             lance_oxy.append(float(record_dict["Lance Oxygen"]))
             silica_flux.append(float(record_dict["Silica Flux"]))
             lime_flux.append(float(record_dict["Lime Flux"]))
+            use_anomalies.append(int(record_dict["Use Nominals"]))
     
     # intial table and other parameters below        
     table_content = [[' ', ' ', ' '],[' ', ' ', ' '],[' ', ' ', ' '],[' ', ' ', ' ']]
@@ -211,7 +220,6 @@ def runNetwork(network, date1, input_data_file):
     plot = plt.figure("Outotec Motion Anomaly Detection", figsize=(32, 6))
     plot.subplots_adjust(wspace =1, hspace =0.5)
     plot.subplots(ncols=2, nrows=3)
-    plot.text(-10, 20, 'GOOD', size = 20)
     
     for i in xrange(_NUM_RECORDS):
         network.run(1)
@@ -222,47 +230,52 @@ def runNetwork(network, date1, input_data_file):
         pre4_1 = sensorRegion.getOutputData("sourceOut")[3]
         pre5_1 = sensorRegion.getOutputData("sourceOut")[4]
         pre6_1 = sensorRegion.getOutputData("sourceOut")[5]
-        CaO.append(pre1_1)
-        Fe_SiO2.append(pre2_1)
-        Cu_Slag.append(pre3_1)
-        Cu_Matte.append(pre4_1)
-        Fe.append(pre5_1)
-        SiO2.append(pre6_1)
+        pre7_1 = sensorRegion.getOutputData("sourceOut")[6]
+        
+        Bath_T.append(pre1_1)
+        CaO.append(pre2_1)
+        Fe_SiO2.append(pre3_1)
+        Cu_Slag.append(pre4_1)
+        Cu_Matte.append(pre5_1)
+        Fe.append(pre6_1)
+        SiO2.append(pre7_1)
         
         # append the input data
         plt_lance_air.append(lance_air[i])
         plt_lance_oxy.append(lance_oxy[i])
         plt_silica_flux.append(silica_flux[i])
         plt_lime_flux.append(lime_flux[i])
+        plt_use_anomalies.append(use_anomalies[i])
         
         average_anomalyScore = anomalyScore
         
         date.append(date1[i])
 
-        print "Date: ", date1[i], "  Chemical Anomaly Score:", anomalyScore
-        print "    --> CaO:      \t", pre1_1
-        print "        Fe/SiO2:  \t", pre2_1
-        print "        Cu Slag:  \t", pre3_1
-        print "        Cu Matte: \t", pre4_1
-        print "        Fe:       \t", pre5_1
-        print "        SiO2:     \t", pre6_1
+#        print "Date: ", date1[i], "  Chemical Anomaly Score:", anomalyScore
+#        print "    --> Bath_T:   \t", pre1_1
+#        print "        CaO:      \t", pre2_1
+#        print "        Fe/SiO2:  \t", pre3_1
+#        print "        Cu Slag:  \t", pre4_1
+#        print "        Cu Matte: \t", pre5_1
+#        print "        Fe:       \t", pre6_1
+#        print "        SiO2:     \t", pre7_1
 
         if average_anomalyScore < 0.1:
-            print "        \033[1;42m GOOD CONDITION \033[0m"
+#            print "        \033[1;42m GOOD CONDITION \033[0m"
             previous_result = 'G'
             status_table_content[0][0] = date1[i]
             status_table_content[0][1] = 'GOOD CONDITION'
             status_table_color[0][1] = '#31de5f'
             status_table_content[0][2] = anomalyScore
-            status_table_color[0][2] = '#31de5f'
+            status_table_color[0][2] = 'w'
         elif average_anomalyScore > 0.1 and average_anomalyScore < 0.2:
-            print "        \033[1;43m WARNING CAUTION \033[0m"
+#            print "        \033[1;43m WARNING CAUTION \033[0m"
             previous_result = 'W'
             status_table_content[0][0] = date1[i]
             status_table_content[0][1] = 'WARNING CAUTION'
             status_table_color[0][1] = '#ff9e36'
             status_table_content[0][2] = anomalyScore
-            status_table_color[0][2] = '#ff9e36'
+            status_table_color[0][2] = 'w'
         else:
             if previous_result == 'D':
                 contineous_flag = True
@@ -271,31 +284,31 @@ def runNetwork(network, date1, input_data_file):
 
             if table_content[0][0] == ' ' and contineous_flag == False:
                 table_content[0][0] = date1[i]
-                table_content[0][1] = str(average_anomalyScore) + ' (BAD CONDITION)'
+                table_content[0][1] = str(average_anomalyScore) + ' (B)'
                 table_content[0][2] = float(0)
             elif table_content[1][0] == ' ' and contineous_flag == False:
                 table_content[1][0] = date1[i]
-                table_content[1][1] = str(average_anomalyScore) + ' (BAD CONDITION)'
+                table_content[1][1] = str(average_anomalyScore) + ' (B)'
                 table_content[1][2] = float(0)
             elif table_content[2][0] == ' ' and contineous_flag == False:
                 table_content[2][0] = date1[i]
-                table_content[2][1] = str(average_anomalyScore) + ' (BAD CONDITION)'
+                table_content[2][1] = str(average_anomalyScore) + ' (B)'
                 table_content[2][2] = float(0)
             elif table_content[3][0] == ' ' and contineous_flag == False:
                 table_content[3][0] = date1[i]
-                table_content[3][1] = str(average_anomalyScore) + ' (BAD CONDITION)'
+                table_content[3][1] = str(average_anomalyScore) + ' (B)'
                 table_content[3][2] = float(0)         
             elif table_content[1][0] == ' ' and contineous_flag == True:
                 table_content[0][0] = date1[i]
-                table_content[0][1] = str(average_anomalyScore) + ' (BAD CONDITION)'
+                table_content[0][1] = str(average_anomalyScore) + ' (B)'
                 table_content[0][2] += seconds_difference(date1[i-1], date1[i])
             elif table_content[2][0] == ' ' and contineous_flag == True:
                 table_content[1][0] = date1[i]
-                table_content[1][1] = str(average_anomalyScore) + ' (BAD CONDITION)'
+                table_content[1][1] = str(average_anomalyScore) + ' (B)'
                 table_content[1][2] += seconds_difference(date1[i-1], date1[i])
             elif table_content[3][0] == ' ' and contineous_flag == True:
                 table_content[2][0] = date1[i]
-                table_content[2][1] = str(average_anomalyScore) + ' (BAD CONDITION)'
+                table_content[2][1] = str(average_anomalyScore) + ' (B)'
                 table_content[2][2] += seconds_difference(date1[i-1], date1[i])
             elif table_content[0][0] != ' ' and table_content[1][0] != ' ' and table_content[2][0] != ' ' and table_content[3][0] != ' ' and contineous_flag == False:
                 table_content[0][0] = table_content[1][0]
@@ -311,23 +324,23 @@ def runNetwork(network, date1, input_data_file):
                 table_content[2][2] = table_content[3][2]
                 
                 table_content[3][0] = date1[i]
-                table_content[3][1] = str(average_anomalyScore) + ' (BAD CONDITION)'
+                table_content[3][1] = str(average_anomalyScore) + ' (B)'
                 table_content[3][2] = 0
             elif table_content[0][0] != ' ' and table_content[1][0] != ' ' and table_content[2][0] != ' ' and table_content[3][0] != ' ' and contineous_flag == True:                
                 table_content[3][0] = date1[i]
-                table_content[3][1] = str(average_anomalyScore) + ' (BAD CONDITION)'
+                table_content[3][1] = str(average_anomalyScore) + ' (B)'
                 table_content[3][2] += seconds_difference(date1[i-1], date1[i])   
-            print "        \033[1;41m DANGEROUS CONDITION \033[0m"
+#            print "        \033[1;41m DANGEROUS CONDITION \033[0m"
             previous_result = 'D'
             status_table_content[0][0] = date1[i]
             status_table_content[0][1] = 'BAD CONDITION'
             status_table_color[0][1] = '#db4439'
             status_table_content[0][2] = anomalyScore
-            status_table_color[0][2] = '#db4439'
-        print "\n"        
+            status_table_color[0][2] = 'w'
+#        print "\n"        
 
-        plt_CaO, plt_Fe_SiO2, plt_Cu_Slag, plt_Cu_Matte, plt_Fe, plt_SiO2, plt_date = plot_chemical_data(CaO, Fe_SiO2, Cu_Slag, Cu_Matte, Fe, SiO2, date)
-        plt2_lance_air, plt2_lance_oxy, plt2_silica_flux, plt2_lime_flux, plt2_date = plot_input_data(plt_lance_air, plt_lance_oxy, plt_silica_flux, plt_lime_flux, date)
+        plt_BathT, plt_CaO, plt_Fe_SiO2, plt_Cu_Slag, plt_Cu_Matte, plt_Fe, plt_SiO2, plt_date = plot_chemical_data(Bath_T, CaO, Fe_SiO2, Cu_Slag, Cu_Matte, Fe, SiO2, date)
+        plt2_lance_air, plt2_lance_oxy, plt2_silica_flux, plt2_lime_flux, plt2_use_anomalies, plt2_date = plot_input_data(plt_lance_air, plt_lance_oxy, plt_silica_flux, plt_lime_flux, plt_use_anomalies, date)
 
         # display the input data
         ax1 = plot.add_subplot(3,6,1)
@@ -350,62 +363,72 @@ def runNetwork(network, date1, input_data_file):
         ax4.plot(plt2_date, plt2_lime_flux, "r--", linewidth=1)
         ax4.set_title('Lime Flux\n')
         
-        # Chemical plot
-        ax1 = plot.add_subplot(3,6,7)
-        ax1.set_xticks([])
-        ax1.plot(plt_date, plt_CaO, "b--", linewidth=1)
-        ax1.set_title('CaO\n')
-        
-        ax2 = plot.add_subplot(3,6,8)
-        ax2.set_xticks([])
-        ax2.plot(plt_date, plt_Fe_SiO2, "b--", linewidth=1)
-        ax2.set_title('Fe/SiO2\n')
-    
-        ax3 = plot.add_subplot(3,6,9)
-        ax3.set_xticks([])
-        ax3.plot(plt_date, plt_Cu_Slag, "b--", linewidth=1)
-        ax3.set_title('Cu Slag\n')
-        
-        ax4 = plot.add_subplot(3,6,10)
-        ax4.set_xticks([])
-        ax4.plot(plt_date, plt_Cu_Matte, "b--", linewidth=1)
-        ax4.set_title('Cu Matte\n')
-        
-        ax5 = plot.add_subplot(3,6,11)
+        ax5 = plot.add_subplot(3,6,5)
         ax5.set_xticks([])
-        ax5.plot(plt_date, plt_Fe, "b--", linewidth=1)
-        ax5.set_title('Fe\n')
-    
-        ax6 = plot.add_subplot(3,6,12)
+        ax5.plot(plt2_date, plt2_use_anomalies, "g-", linewidth=2)
+        ax5.set_title('Use Nominals\n')
+        
+        # Chemical plot
+        ax6 = plot.add_subplot(3,6,6)
         ax6.set_xticks([])
-        ax6.plot(plt_date, plt_SiO2, "b--", linewidth=1)
-        ax6.set_title('SiO2\n')
+        ax6.plot(plt_date, plt_BathT, "b--", linewidth=1)
+        ax6.set_title('Bath T\n')
+        
+        ax7 = plot.add_subplot(3,6,7)
+        ax7.set_xticks([])
+        ax7.plot(plt_date, plt_CaO, "b--", linewidth=1)
+        ax7.set_title('CaO\n')
+        
+        ax8 = plot.add_subplot(3,6,8)
+        ax8.set_xticks([])
+        ax8.plot(plt_date, plt_Fe_SiO2, "b--", linewidth=1)
+        ax8.set_title('Fe/SiO2\n')
+    
+        ax9 = plot.add_subplot(3,6,9)
+        ax9.set_xticks([])
+        ax9.plot(plt_date, plt_Cu_Slag, "b--", linewidth=1)
+        ax9.set_title('Cu Slag\n')
+        
+        ax10 = plot.add_subplot(3,6,10)
+        ax10.set_xticks([])
+        ax10.plot(plt_date, plt_Cu_Matte, "b--", linewidth=1)
+        ax10.set_title('Cu Matte\n')
+        
+        ax11 = plot.add_subplot(3,6,11)
+        ax11.set_xticks([])
+        ax11.plot(plt_date, plt_Fe, "b--", linewidth=1)
+        ax11.set_title('Fe\n')
+    
+        ax12 = plot.add_subplot(3,6,12)
+        ax12.set_xticks([])
+        ax12.plot(plt_date, plt_SiO2, "b--", linewidth=1)
+        ax12.set_title('SiO2\n')
         
         # table has been defined here
-        ax15 = plot.add_subplot(3,6,13)
-        table = ax15.table(
+        ax13 = plot.add_subplot(3,6,13)
+        table = ax13.table(
                 cellText = table_content,
                 cellLoc = 'center',
                 colLabels = ['Log date', 'Average anomaly score', 'Duration (seconds)'],
                 bbox=[0, -0.5, 5, 1.6]
                 )
         table.scale(6, 6)
-        ax15.axis("off")
+        ax13.axis("off")
         
         for key, cell in table.get_celld().items():
             cell.set_linewidth(0.5)
             
         # status showing table has been defined here
-        ax16 = plot.add_subplot(3,6,16)
-        table = ax16.table(
+        ax14 = plot.add_subplot(3,6,16)
+        table = ax14.table(
                 cellText = status_table_content,
                 cellColours = status_table_color,
                 cellLoc = 'center',
-                colLabels = ['Current date', 'Status', 'Anomaly Score'],
+                colLabels = ['Current date', 'Predicted Status', 'Anomaly Score'],
                 bbox=[0, -0.3, 5, 1.4]
                 )
         table.scale(5.5, 5.5)
-        ax16.axis("off")
+        ax14.axis("off")
         
         for key, cell in table.get_celld().items():
             cell.set_linewidth(0.5)
@@ -413,7 +436,7 @@ def runNetwork(network, date1, input_data_file):
         plot.show()
         plt.pause(1e-17)
         
-        time.sleep(1)
+        time.sleep(1.5)
         plot.clf()
 
 
@@ -476,6 +499,20 @@ if __name__ == "__main__":
     # The encoder fields for inputs
     scalarEncoder1Args = {
       "w": 21,
+      "minval": 1200.00 - 16.00,
+      "maxval": 1200.00 + 16.00,
+      "periodic": False,
+      "n": 50,
+      "radius": 0,
+      "resolution": 0,
+      "name": "Bath T",
+      "verbosity": 0,
+      "clipInput": True,
+      "forced": False,
+    }
+        
+    scalarEncoder2Args = {
+      "w": 21,
       "minval": 5.00 - 0.025,
       "maxval": 5.00 + 0.025,
       "periodic": False,
@@ -488,7 +525,7 @@ if __name__ == "__main__":
       "forced": False,
     }
     
-    scalarEncoder2Args = {
+    scalarEncoder3Args = {
       "w": 21,
       "minval": 1.249 - 0.005,
       "maxval": 1.249 + 0.005,
@@ -502,7 +539,7 @@ if __name__ == "__main__":
       "forced": False,
     }
 
-    scalarEncoder3Args = {
+    scalarEncoder4Args = {
       "w": 21,
       "minval": 0.0119 - 0.001,
       "maxval": 0.0119 + 0.001,
@@ -516,7 +553,7 @@ if __name__ == "__main__":
       "forced": False,
     }
     
-    scalarEncoder4Args = {
+    scalarEncoder5Args = {
       "w": 21,
       "minval": 59.93 - 0.5,
       "maxval": 59.93 + 0.5,
@@ -530,7 +567,7 @@ if __name__ == "__main__":
       "forced": False,
     }
 
-    scalarEncoder5Args = {
+    scalarEncoder6Args = {
       "w": 21,
       "minval": 38.90 - 0.06,
       "maxval": 38.90 + 0.06,
@@ -544,7 +581,7 @@ if __name__ == "__main__":
       "forced": False,
     }
 
-    scalarEncoder6Args = {
+    scalarEncoder7Args = {
       "w": 21,
       "minval": 31.13 - 0.05,
       "maxval": 31.13 + 0.05,
@@ -577,6 +614,7 @@ if __name__ == "__main__":
       "scalarEncoder4Args": scalarEncoder4Args,
       "scalarEncoder5Args": scalarEncoder5Args,
       "scalarEncoder6Args": scalarEncoder6Args,
+      "scalarEncoder7Args": scalarEncoder7Args,
       "dateEncoderArgs": dateEncoderArgs,
     }
     
