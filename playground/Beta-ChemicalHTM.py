@@ -16,31 +16,13 @@ def createTemporalAnomaly_chemical(recordParams, spatialParams, temporalParams, 
 
     inputFilePath = recordParams["inputFilePath"]
     scalarEncoder1Args = recordParams["scalarEncoder1Args"]
-    scalarEncoder2Args = recordParams["scalarEncoder2Args"]
-    scalarEncoder3Args = recordParams["scalarEncoder3Args"]
-    scalarEncoder4Args = recordParams["scalarEncoder4Args"]
-    scalarEncoder5Args = recordParams["scalarEncoder5Args"]
-    scalarEncoder6Args = recordParams["scalarEncoder6Args"]
-    scalarEncoder7Args = recordParams["scalarEncoder7Args"]
     dateEncoderArgs = recordParams["dateEncoderArgs"]
 
-    scalarEncoder1 = ScalarEncoder(**scalarEncoder1Args)
-    scalarEncoder2 = ScalarEncoder(**scalarEncoder2Args)
-    scalarEncoder3 = ScalarEncoder(**scalarEncoder3Args)
-    scalarEncoder4 = ScalarEncoder(**scalarEncoder4Args)
-    scalarEncoder5 = ScalarEncoder(**scalarEncoder5Args)
-    scalarEncoder6 = ScalarEncoder(**scalarEncoder6Args)
-    scalarEncoder7 = ScalarEncoder(**scalarEncoder7Args)    
+    scalarEncoder1 = ScalarEncoder(**scalarEncoder1Args) 
     dateEncoder = DateEncoder(**dateEncoderArgs)
 
     encoder = MultiEncoder()
     encoder.addEncoder(scalarEncoder1Args["name"], scalarEncoder1)
-    encoder.addEncoder(scalarEncoder2Args["name"], scalarEncoder2)
-    encoder.addEncoder(scalarEncoder3Args["name"], scalarEncoder3)
-    encoder.addEncoder(scalarEncoder4Args["name"], scalarEncoder4)
-    encoder.addEncoder(scalarEncoder5Args["name"], scalarEncoder5)
-    encoder.addEncoder(scalarEncoder6Args["name"], scalarEncoder6)
-    encoder.addEncoder(scalarEncoder7Args["name"], scalarEncoder7)
     encoder.addEncoder(dateEncoderArgs["name"], dateEncoder)
 
     network = Network()
@@ -100,13 +82,6 @@ def mean(numbers):
     return float(sum(numbers)) / max(len(numbers), 1)
 
 
-#def get_round(input_list, n):
-#    result = []
-#    for i in input_list:
-#        result.append(round(i, n))
-#    return result
-
-
 def reverse(in_list):
     out_list = []
     for i in in_list:
@@ -145,23 +120,10 @@ def plot_chemical_data(Bath_T, CaO, Fe_SiO2, Cu_Slag, Cu_Matte, Fe, SiO2, date, 
         new_Cu_Matte = Cu_Matte[-buffer_size:]
         new_Fe = Fe[-buffer_size:]
         new_SiO2 = SiO2[-buffer_size:]
-        new_date = date[-buffer_size:]
-        
-#        new_CaO = get_round(new_CaO, 5)
-#        new_Fe_SiO2 = get_round(new_Fe_SiO2, 5)
-#        new_Cu_Slag = get_round(new_Cu_Slag, 5)
-#        new_Cu_Matte = get_round(new_Cu_Matte, 5)
-#        new_Fe = get_round(new_Fe, 5)
-#        new_SiO2 = get_round(new_SiO2, 5)
+        new_date = date[-buffer_size:]       
         
         return new_Bath_T, new_CaO, new_Fe_SiO2, new_Cu_Slag, new_Cu_Matte, new_Fe, new_SiO2, new_date
     else:
-#        CaO = get_round(CaO, 5)
-#        Fe_SiO2 = get_round(Fe_SiO2, 5)
-#        Cu_Slag = get_round(Cu_Slag, 5)
-#        Cu_Matte = get_round(Cu_Matte, 5)
-#        Fe = get_round(Fe, 5)
-#        SiO2 = get_round(SiO2, 5)
         return Bath_T, CaO, Fe_SiO2, Cu_Slag, Cu_Matte, Fe, SiO2, date
 
     
@@ -232,10 +194,37 @@ def evaluation(use_nominals, status_records):
     return u1_top_1, u1_top_2, u0_top_1, u0_top_2
     
     
-def runNetwork(network, date1, input_data_file):
-    sensorRegion = network.regions["sensor"]
-    temporalPoolerRegion = network.regions["temporalPoolerRegion"]
+def runNetwork(network1,
+               network2,
+               network3,
+               network4,
+               network5,
+               network6,
+               network7,
+               date1, 
+               input_data_file):
+    
+    sensorRegion1 = network1.regions["sensor"]
+    temporalPoolerRegion1 = network1.regions["temporalPoolerRegion"]
+    
+    sensorRegion2 = network2.regions["sensor"]
+    temporalPoolerRegion2 = network2.regions["temporalPoolerRegion"]
 
+    sensorRegion3 = network3.regions["sensor"]
+    temporalPoolerRegion3 = network3.regions["temporalPoolerRegion"]
+
+    sensorRegion4 = network4.regions["sensor"]
+    temporalPoolerRegion4 = network4.regions["temporalPoolerRegion"]
+    
+    sensorRegion5 = network5.regions["sensor"]
+    temporalPoolerRegion5 = network5.regions["temporalPoolerRegion"]
+    
+    sensorRegion6 = network6.regions["sensor"]
+    temporalPoolerRegion6 = network6.regions["temporalPoolerRegion"]
+    
+    sensorRegion7 = network7.regions["sensor"]
+    temporalPoolerRegion7 = network7.regions["temporalPoolerRegion"]
+    
     # output data
     date = []
     Bath_T = []
@@ -291,23 +280,42 @@ def runNetwork(network, date1, input_data_file):
     plot.subplots(ncols=2, nrows=3)
     
     for i in xrange(_NUM_RECORDS):
-        network.run(1)
-        anomalyScore = temporalPoolerRegion.getOutputData("anomalyScore")[0]
-        pre1_1 = sensorRegion.getOutputData("sourceOut")[0]
-        pre2_1 = sensorRegion.getOutputData("sourceOut")[1]
-        pre3_1 = sensorRegion.getOutputData("sourceOut")[2]
-        pre4_1 = sensorRegion.getOutputData("sourceOut")[3]
-        pre5_1 = sensorRegion.getOutputData("sourceOut")[4]
-        pre6_1 = sensorRegion.getOutputData("sourceOut")[5]
-        pre7_1 = sensorRegion.getOutputData("sourceOut")[6]
+        network1.run(1)
+        anomalyScore1 = temporalPoolerRegion1.getOutputData("anomalyScore")[0]
+        pre1_1 = sensorRegion1.getOutputData("sourceOut")[0]
+        
+        network2.run(1)
+        anomalyScore2 = temporalPoolerRegion2.getOutputData("anomalyScore")[0]
+        pre1_2 = sensorRegion2.getOutputData("sourceOut")[0]
+        
+        network3.run(1)
+        anomalyScore3 = temporalPoolerRegion3.getOutputData("anomalyScore")[0]
+        pre1_3 = sensorRegion3.getOutputData("sourceOut")[0]
+        
+        network4.run(1)
+        anomalyScore4 = temporalPoolerRegion4.getOutputData("anomalyScore")[0]
+        pre1_4 = sensorRegion4.getOutputData("sourceOut")[0]
+        
+        network5.run(1)
+        anomalyScore5 = temporalPoolerRegion5.getOutputData("anomalyScore")[0]
+        pre1_5 = sensorRegion5.getOutputData("sourceOut")[0]
+        
+        network6.run(1)
+        anomalyScore6 = temporalPoolerRegion6.getOutputData("anomalyScore")[0]
+        pre1_6 = sensorRegion6.getOutputData("sourceOut")[0]
+        
+        network7.run(1)
+        anomalyScore7 = temporalPoolerRegion7.getOutputData("anomalyScore")[0]
+        pre1_7 = sensorRegion7.getOutputData("sourceOut")[0]
+
         
         Bath_T.append(pre1_1)
-        CaO.append(pre2_1)
-        Fe_SiO2.append(pre3_1)
-        Cu_Slag.append(pre4_1)
-        Cu_Matte.append(pre5_1)
-        Fe.append(pre6_1)
-        SiO2.append(pre7_1)
+        CaO.append(pre1_2)
+        Fe_SiO2.append(pre1_3)
+        Cu_Slag.append(pre1_4)
+        Cu_Matte.append(pre1_5)
+        Fe.append(pre1_6)
+        SiO2.append(pre1_7)
         
         # append the input data
         plt_lance_air.append(lance_air[i])
@@ -316,7 +324,8 @@ def runNetwork(network, date1, input_data_file):
         plt_lime_flux.append(lime_flux[i])
         plt_use_anomalies.append(use_anomalies[i])
         
-        average_anomalyScore = anomalyScore
+        average_anomalyScore = mean([anomalyScore1,anomalyScore2,anomalyScore3,anomalyScore4,
+                                     anomalyScore5,anomalyScore6,anomalyScore7])
         
         date.append(date1[i])
 
@@ -337,7 +346,7 @@ def runNetwork(network, date1, input_data_file):
             status_table_content[0][0] = date1[i]
             status_table_content[0][1] = 'GOOD CONDITION'
             status_table_color[0][1] = '#31de5f'
-            status_table_content[0][2] = anomalyScore
+            status_table_content[0][2] = average_anomalyScore
             status_table_color[0][2] = 'w'
         elif average_anomalyScore > 0.12 and average_anomalyScore < 0.165:
 #            print "        \033[1;43m WARNING CAUTION \033[0m"
@@ -347,7 +356,7 @@ def runNetwork(network, date1, input_data_file):
             status_table_content[0][0] = date1[i]
             status_table_content[0][1] = 'WARNING CAUTION'
             status_table_color[0][1] = '#ff9e36'
-            status_table_content[0][2] = anomalyScore
+            status_table_content[0][2] = average_anomalyScore
             status_table_color[0][2] = 'w'
         else:
             if previous_result == 'D':
@@ -410,7 +419,7 @@ def runNetwork(network, date1, input_data_file):
             status_table_content[0][0] = date1[i]
             status_table_content[0][1] = 'BAD CONDITION'
             status_table_color[0][1] = '#db4439'
-            status_table_content[0][2] = anomalyScore
+            status_table_content[0][2] = average_anomalyScore
             status_table_color[0][2] = 'w'
 #        print "\n"        
 
@@ -579,6 +588,8 @@ if __name__ == "__main__":
     #
     #
     # The encoder fields for inputs
+    
+    # Bath T
     scalarEncoder1Args = {
       "w": 21,
       "minval": 1200.00 - 10.00,
@@ -592,8 +603,26 @@ if __name__ == "__main__":
       "clipInput": True,
       "forced": False,
     }
-        
-    scalarEncoder2Args = {
+    
+    dateEncoderArgs = {
+      "season": 0,
+      "dayOfWeek": 0,
+      "weekend": 0,
+      "holiday": 0,
+      "timeOfDay": (21, 9.75),
+      "customDays": 0,
+      "name": "Time",
+      "forced": False
+    }
+    
+    Bath_recordParams = {
+      "inputFilePath": output_data_feed_rate,
+      "scalarEncoder1Args": scalarEncoder1Args,
+      "dateEncoderArgs": dateEncoderArgs,
+    }
+    
+    # CaO %    
+    scalarEncoder1Args = {
       "w": 21,
       "minval": 5.00 - 0.025,
       "maxval": 5.00 + 0.025,
@@ -607,7 +636,25 @@ if __name__ == "__main__":
       "forced": False,
     }
     
-    scalarEncoder3Args = {
+    dateEncoderArgs = {
+      "season": 0,
+      "dayOfWeek": 0,
+      "weekend": 0,
+      "holiday": 0,
+      "timeOfDay": (21, 1),
+      "customDays": 0,
+      "name": "Time",
+      "forced": False
+    }
+    
+    CaO_recordParams = {
+      "inputFilePath": output_data_feed_rate,
+      "scalarEncoder1Args": scalarEncoder1Args,
+      "dateEncoderArgs": dateEncoderArgs,
+    }
+    
+    # Fe/SiO2
+    scalarEncoder1Args = {
       "w": 21,
       "minval": 1.249 - 0.003,
       "maxval": 1.249 + 0.003,
@@ -620,8 +667,26 @@ if __name__ == "__main__":
       "clipInput": True,
       "forced": False,
     }
+    
+    dateEncoderArgs = {
+      "season": 0,
+      "dayOfWeek": 0,
+      "weekend": 0,
+      "holiday": 0,
+      "timeOfDay": (21, 1),
+      "customDays": 0,
+      "name": "Time",
+      "forced": False
+    }
+    
+    Fe_SiO2_recordParams = {
+      "inputFilePath": output_data_feed_rate,
+      "scalarEncoder1Args": scalarEncoder1Args,
+      "dateEncoderArgs": dateEncoderArgs,
+    }
 
-    scalarEncoder4Args = {
+    # Cu Slag
+    scalarEncoder1Args = {
       "w": 21,
       "minval": 0.0119 - 0.0004,
       "maxval": 0.0119 + 0.001,
@@ -635,7 +700,25 @@ if __name__ == "__main__":
       "forced": False,
     }
     
-    scalarEncoder5Args = {
+    dateEncoderArgs = {
+      "season": 0,
+      "dayOfWeek": 0,
+      "weekend": 0,
+      "holiday": 0,
+      "timeOfDay": (21, 1),
+      "customDays": 0,
+      "name": "Time",
+      "forced": False
+    }
+    
+    Cu_Slag_recordParams = {
+      "inputFilePath": output_data_feed_rate,
+      "scalarEncoder1Args": scalarEncoder1Args,
+      "dateEncoderArgs": dateEncoderArgs,
+    }
+    
+    # Cu Matte
+    scalarEncoder1Args = {
       "w": 21,
       "minval": 59.93 - 0.3,
       "maxval": 59.93 + 0.5,
@@ -649,7 +732,25 @@ if __name__ == "__main__":
       "forced": False,
     }
 
-    scalarEncoder6Args = {
+    dateEncoderArgs = {
+      "season": 0,
+      "dayOfWeek": 0,
+      "weekend": 0,
+      "holiday": 0,
+      "timeOfDay": (21, 1),
+      "customDays": 0,
+      "name": "Time",
+      "forced": False
+    }
+    
+    Cu_Matte_recordParams = {
+      "inputFilePath": output_data_feed_rate,
+      "scalarEncoder1Args": scalarEncoder1Args,
+      "dateEncoderArgs": dateEncoderArgs,
+    }
+    
+    # Fe
+    scalarEncoder1Args = {
       "w": 21,
       "minval": 38.90 - 0.06,
       "maxval": 38.90 + 0.06,
@@ -662,8 +763,26 @@ if __name__ == "__main__":
       "clipInput": True,
       "forced": False,
     }
+    
+    dateEncoderArgs = {
+      "season": 0,
+      "dayOfWeek": 0,
+      "weekend": 0,
+      "holiday": 0,
+      "timeOfDay": (21, 1),
+      "customDays": 0,
+      "name": "Time",
+      "forced": False
+    }
+    
+    Fe_recordParams = {
+      "inputFilePath": output_data_feed_rate,
+      "scalarEncoder1Args": scalarEncoder1Args,
+      "dateEncoderArgs": dateEncoderArgs,
+    }
 
-    scalarEncoder7Args = {
+    # SiO2
+    scalarEncoder1Args = {
       "w": 21,
       "minval": 31.13 - 0.06,
       "maxval": 31.13 + 0.03,
@@ -682,33 +801,71 @@ if __name__ == "__main__":
       "dayOfWeek": 0,
       "weekend": 0,
       "holiday": 0,
-      "timeOfDay": (21, 4),
+      "timeOfDay": (21, 1),
       "customDays": 0,
       "name": "Time",
       "forced": False
     }
-
-    chemical_recordParams = {
+    
+    SiO2_recordParams = {
       "inputFilePath": output_data_feed_rate,
       "scalarEncoder1Args": scalarEncoder1Args,
-      "scalarEncoder2Args": scalarEncoder2Args,
-      "scalarEncoder3Args": scalarEncoder3Args,
-      "scalarEncoder4Args": scalarEncoder4Args,
-      "scalarEncoder5Args": scalarEncoder5Args,
-      "scalarEncoder6Args": scalarEncoder6Args,
-      "scalarEncoder7Args": scalarEncoder7Args,
       "dateEncoderArgs": dateEncoderArgs,
-    }
-    
+    }    
     #--------------------------------------------------------------------------
     #
     #
     # Generate networks and run them
-    chemical_network = createTemporalAnomaly_chemical(chemical_recordParams,
+    Bath_network = createTemporalAnomaly_chemical(Bath_recordParams,
+                                                  spatialParams=_SP_PARAMS,
+                                                  temporalParams=_TM_PARAMS,
+                                                  verbosity=_VERBOSITY)
+    
+    CaO_network = createTemporalAnomaly_chemical(CaO_recordParams,
+                                                 spatialParams=_SP_PARAMS,
+                                                 temporalParams=_TM_PARAMS,
+                                                 verbosity=_VERBOSITY)
+    
+    Fe_SiO2_network = createTemporalAnomaly_chemical(Fe_SiO2_recordParams,
+                                                     spatialParams=_SP_PARAMS,
+                                                     temporalParams=_TM_PARAMS,
+                                                     verbosity=_VERBOSITY)
+    
+    Cu_Slag_network = createTemporalAnomaly_chemical(Cu_Slag_recordParams,
+                                                     spatialParams=_SP_PARAMS,
+                                                     temporalParams=_TM_PARAMS,
+                                                     verbosity=_VERBOSITY)
+    
+    Cu_Matte_network = createTemporalAnomaly_chemical(Cu_Matte_recordParams,
                                                       spatialParams=_SP_PARAMS,
                                                       temporalParams=_TM_PARAMS,
                                                       verbosity=_VERBOSITY)
     
-    chemical_date = getDate(chemical_recordParams, _NUM_RECORDS) 
+    Fe_network = createTemporalAnomaly_chemical(Fe_recordParams,
+                                                spatialParams=_SP_PARAMS,
+                                                temporalParams=_TM_PARAMS,
+                                                verbosity=_VERBOSITY)
     
-    runNetwork(chemical_network, chemical_date, input_data_feed_rate)
+    SiO2_network = createTemporalAnomaly_chemical(SiO2_recordParams,
+                                                  spatialParams=_SP_PARAMS,
+                                                  temporalParams=_TM_PARAMS,
+                                                  verbosity=_VERBOSITY)
+    
+    Bath_date = getDate(Bath_recordParams, _NUM_RECORDS)
+    CaO_date = getDate(CaO_recordParams, _NUM_RECORDS)
+    Fe_SiO2_date = getDate(Fe_SiO2_recordParams, _NUM_RECORDS)
+    Cu_Slag_date = getDate(Cu_Slag_recordParams, _NUM_RECORDS)
+    Cu_Matte_date = getDate(Cu_Matte_recordParams, _NUM_RECORDS)
+    Fe_date = getDate(Fe_recordParams, _NUM_RECORDS)
+    SiO2_date = getDate(SiO2_recordParams, _NUM_RECORDS)
+    
+    # run all of these networks
+    runNetwork(Bath_network,
+               CaO_network,
+               Fe_SiO2_network,
+               Cu_Slag_network,
+               Cu_Matte_network,
+               Fe_network,
+               SiO2_network,
+               Bath_date, 
+               input_data_feed_rate)
