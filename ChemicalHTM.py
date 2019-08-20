@@ -73,6 +73,14 @@ def createTemporalAnomaly_chemical(recordParams, spatialParams, temporalParams, 
     network.link("spatialPoolerRegion", "temporalPoolerRegion", "UniformLink", "")
     network.link("temporalPoolerRegion", "spatialPoolerRegion", "UniformLink", "",
                  srcOutput="topDownOut", destInput="topDownIn")
+    
+    # Add the AnomalyLikelihoodRegion on top of the TMRegion
+    network.addRegion("anomalyLikelihoodRegion", "py.AnomalyLikelihoodRegion", json.dumps({}))
+    network.link("temporalPoolerRegion", "anomalyLikelihoodRegion", "UniformLink",
+                 "", srcOutput="anomalyScore", destInput="rawAnomalyScore")
+    network.link("sensor", "anomalyLikelihoodRegion", "UniformLink", "",
+                 srcOutput="sourceOut", destInput="metricValue")    
+
 
     spatialPoolerRegion = network.regions["spatialPoolerRegion"]
 
@@ -165,7 +173,7 @@ def plot_chemical_data(Bath_T, CaO, Fe_SiO2, Cu_Slag, Cu_Matte, Fe, SiO2, date, 
         return Bath_T, CaO, Fe_SiO2, Cu_Slag, Cu_Matte, Fe, SiO2, date
 
     
-def plot_input_data(lance_air, lance_oxy, silica_flux, lime_flux, use_anomalies, date, buffer_size=800):
+def plot_input_data(lance_air, lance_oxy, silica_flux, lime_flux, use_anomalies, date, buffer_size=899):
     if len(lance_air) > buffer_size and len(lance_oxy) > buffer_size and len(silica_flux) > buffer_size and len(lime_flux) > buffer_size and len(use_anomalies) > buffer_size:
         new_lance_air = lance_air[-buffer_size:]
         new_lance_oxy = lance_oxy[-buffer_size:]
@@ -234,7 +242,7 @@ def evaluation(use_nominals, status_records):
     
 def runNetwork(network, date1, input_data_file):
     sensorRegion = network.regions["sensor"]
-    temporalPoolerRegion = network.regions["temporalPoolerRegion"]
+    anomalyLikelihoodRegion = network.regions["anomalyLikelihoodRegion"]
 
     # output data
     date = []
@@ -292,7 +300,7 @@ def runNetwork(network, date1, input_data_file):
     
     for i in xrange(_NUM_RECORDS):
         network.run(1)
-        anomalyScore = temporalPoolerRegion.getOutputData("anomalyScore")[0]
+        anomalyLikelihood = anomalyLikelihoodRegion.getOutputData("anomalyLikelihood")[0]
         pre1_1 = sensorRegion.getOutputData("sourceOut")[0]
         pre2_1 = sensorRegion.getOutputData("sourceOut")[1]
         pre3_1 = sensorRegion.getOutputData("sourceOut")[2]
@@ -315,9 +323,7 @@ def runNetwork(network, date1, input_data_file):
         plt_silica_flux.append(silica_flux[i])
         plt_lime_flux.append(lime_flux[i])
         plt_use_anomalies.append(use_anomalies[i])
-        
-        average_anomalyScore = anomalyScore
-        
+                
         date.append(date1[i])
 
 #        print "Date: ", date1[i], "  Chemical Anomaly Score:", anomalyScore
@@ -329,7 +335,7 @@ def runNetwork(network, date1, input_data_file):
 #        print "        Fe:       \t", pre6_1
 #        print "        SiO2:     \t", pre7_1
 
-        if average_anomalyScore < 0.12:
+        if anomalyLikelihood < 0.85:
 #            print "        \033[1;42m GOOD CONDITION \033[0m"
             previous_result = 'G'
             status_records.append('G')
@@ -337,9 +343,9 @@ def runNetwork(network, date1, input_data_file):
             status_table_content[0][0] = date1[i]
             status_table_content[0][1] = 'GOOD CONDITION'
             status_table_color[0][1] = '#31de5f'
-            status_table_content[0][2] = anomalyScore
+            status_table_content[0][2] = anomalyLikelihood
             status_table_color[0][2] = 'w'
-        elif average_anomalyScore > 0.12 and average_anomalyScore < 0.165:
+        elif anomalyLikelihood >=0.85 and anomalyLikelihood < 0.94:
 #            print "        \033[1;43m WARNING CAUTION \033[0m"
             previous_result = 'W'
             status_records.append('W')
@@ -347,7 +353,7 @@ def runNetwork(network, date1, input_data_file):
             status_table_content[0][0] = date1[i]
             status_table_content[0][1] = 'WARNING CAUTION'
             status_table_color[0][1] = '#ff9e36'
-            status_table_content[0][2] = anomalyScore
+            status_table_content[0][2] = anomalyLikelihood
             status_table_color[0][2] = 'w'
         else:
             if previous_result == 'D':
@@ -357,31 +363,31 @@ def runNetwork(network, date1, input_data_file):
 
             if table_content[0][0] == ' ' and contineous_flag == False:
                 table_content[0][0] = date1[i]
-                table_content[0][1] = str(average_anomalyScore) + ' (B)'
+                table_content[0][1] = str(anomalyLikelihood) + ' (B)'
                 table_content[0][2] = float(0)
             elif table_content[1][0] == ' ' and contineous_flag == False:
                 table_content[1][0] = date1[i]
-                table_content[1][1] = str(average_anomalyScore) + ' (B)'
+                table_content[1][1] = str(anomalyLikelihood) + ' (B)'
                 table_content[1][2] = float(0)
             elif table_content[2][0] == ' ' and contineous_flag == False:
                 table_content[2][0] = date1[i]
-                table_content[2][1] = str(average_anomalyScore) + ' (B)'
+                table_content[2][1] = str(anomalyLikelihood) + ' (B)'
                 table_content[2][2] = float(0)
             elif table_content[3][0] == ' ' and contineous_flag == False:
                 table_content[3][0] = date1[i]
-                table_content[3][1] = str(average_anomalyScore) + ' (B)'
+                table_content[3][1] = str(anomalyLikelihood) + ' (B)'
                 table_content[3][2] = float(0)         
             elif table_content[1][0] == ' ' and contineous_flag == True:
                 table_content[0][0] = date1[i]
-                table_content[0][1] = str(average_anomalyScore) + ' (B)'
+                table_content[0][1] = str(anomalyLikelihood) + ' (B)'
                 table_content[0][2] += seconds_difference(date1[i-1], date1[i])
             elif table_content[2][0] == ' ' and contineous_flag == True:
                 table_content[1][0] = date1[i]
-                table_content[1][1] = str(average_anomalyScore) + ' (B)'
+                table_content[1][1] = str(anomalyLikelihood) + ' (B)'
                 table_content[1][2] += seconds_difference(date1[i-1], date1[i])
             elif table_content[3][0] == ' ' and contineous_flag == True:
                 table_content[2][0] = date1[i]
-                table_content[2][1] = str(average_anomalyScore) + ' (B)'
+                table_content[2][1] = str(anomalyLikelihood) + ' (B)'
                 table_content[2][2] += seconds_difference(date1[i-1], date1[i])
             elif table_content[0][0] != ' ' and table_content[1][0] != ' ' and table_content[2][0] != ' ' and table_content[3][0] != ' ' and contineous_flag == False:
                 table_content[0][0] = table_content[1][0]
@@ -397,11 +403,11 @@ def runNetwork(network, date1, input_data_file):
                 table_content[2][2] = table_content[3][2]
                 
                 table_content[3][0] = date1[i]
-                table_content[3][1] = str(average_anomalyScore) + ' (B)'
+                table_content[3][1] = str(anomalyLikelihood) + ' (B)'
                 table_content[3][2] = 0
             elif table_content[0][0] != ' ' and table_content[1][0] != ' ' and table_content[2][0] != ' ' and table_content[3][0] != ' ' and contineous_flag == True:                
                 table_content[3][0] = date1[i]
-                table_content[3][1] = str(average_anomalyScore) + ' (B)'
+                table_content[3][1] = str(anomalyLikelihood) + ' (B)'
                 table_content[3][2] += seconds_difference(date1[i-1], date1[i])   
 #            print "        \033[1;41m DANGEROUS CONDITION \033[0m"
             previous_result = 'D'
@@ -410,7 +416,7 @@ def runNetwork(network, date1, input_data_file):
             status_table_content[0][0] = date1[i]
             status_table_content[0][1] = 'BAD CONDITION'
             status_table_color[0][1] = '#db4439'
-            status_table_content[0][2] = anomalyScore
+            status_table_content[0][2] = anomalyLikelihood
             status_table_color[0][2] = 'w'
 #        print "\n"        
 
@@ -485,7 +491,7 @@ def runNetwork(network, date1, input_data_file):
         table = ax13.table(
                 cellText = table_content,
                 cellLoc = 'center',
-                colLabels = ['Log date', 'Average anomaly score', 'Duration (seconds)'],
+                colLabels = ['Log date', 'Anomaly Likelihood', 'Duration (seconds)'],
                 bbox=[0, -0.5, 5, 1.6]
                 )
         table.scale(6, 6)
@@ -500,7 +506,7 @@ def runNetwork(network, date1, input_data_file):
                 cellText = status_table_content,
                 cellColours = status_table_color,
                 cellLoc = 'center',
-                colLabels = ['Current date', 'Predicted Status', 'Anomaly Score'],
+                colLabels = ['Current date', 'Predicted Status', 'Anomaly Likelihood'],
                 bbox=[0, -0.3, 5, 1.4]
                 )
         table.scale(5.5, 5.5)
@@ -511,6 +517,7 @@ def runNetwork(network, date1, input_data_file):
             
         # print real-time evaluation results
         u1_top_1, u1_top_2, u0_top_1, u0_top_2 = evaluation(plt_use_anomalies, status_records)
+        print "anomalyLikelihood: ", anomalyLikelihood
         print "When < Use nominals = 1 >, top-1: ", u1_top_1, " ; top-2: ", u1_top_2
         print "When < Use nominals = 0 >, top-1: ", u0_top_1, " ; top-2: ", u0_top_2
         print "\n"
