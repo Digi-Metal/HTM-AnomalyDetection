@@ -17,59 +17,17 @@ from nupic.engine import Network
 from nupic.encoders import MultiEncoder, ScalarEncoder, DateEncoder
 
 
-def createTemporalAnomaly_chemical(recordParams, spatialParams, temporalParams, verbosity):
+def createTemporalAnomaly(recordParams, spatialParams, temporalParams, verbosity):
 
     inputFilePath = recordParams["inputFilePath"]
     scalarEncoder1Args = recordParams["scalarEncoder1Args"]
-    scalarEncoder2Args = recordParams["scalarEncoder2Args"]
-    scalarEncoder3Args = recordParams["scalarEncoder3Args"]
-    scalarEncoder4Args = recordParams["scalarEncoder4Args"]
-    scalarEncoder5Args = recordParams["scalarEncoder5Args"]
-    scalarEncoder6Args = recordParams["scalarEncoder6Args"]
-    scalarEncoder7Args = recordParams["scalarEncoder7Args"]
-    scalarEncoder8Args = recordParams["scalarEncoder8Args"]
-    scalarEncoder9Args = recordParams["scalarEncoder9Args"]
-    scalarEncoder10Args = recordParams["scalarEncoder10Args"]
-    scalarEncoder11Args = recordParams["scalarEncoder11Args"]
-    scalarEncoder12Args = recordParams["scalarEncoder12Args"]
-#    scalarEncoder13Args = recordParams["scalarEncoder13Args"]
-#    scalarEncoder14Args = recordParams["scalarEncoder14Args"]
-#    scalarEncoder15Args = recordParams["scalarEncoder15Args"]    
     dateEncoderArgs = recordParams["dateEncoderArgs"]
 
-    scalarEncoder1 = ScalarEncoder(**scalarEncoder1Args)
-    scalarEncoder2 = ScalarEncoder(**scalarEncoder2Args)
-    scalarEncoder3 = ScalarEncoder(**scalarEncoder3Args)
-    scalarEncoder4 = ScalarEncoder(**scalarEncoder4Args)
-    scalarEncoder5 = ScalarEncoder(**scalarEncoder5Args)
-    scalarEncoder6 = ScalarEncoder(**scalarEncoder6Args)
-    scalarEncoder7 = ScalarEncoder(**scalarEncoder7Args)  
-    scalarEncoder8 = ScalarEncoder(**scalarEncoder8Args)
-    scalarEncoder9 = ScalarEncoder(**scalarEncoder9Args)
-    scalarEncoder10 = ScalarEncoder(**scalarEncoder10Args)
-    scalarEncoder11 = ScalarEncoder(**scalarEncoder11Args)
-    scalarEncoder12 = ScalarEncoder(**scalarEncoder12Args)
-#    scalarEncoder13 = ScalarEncoder(**scalarEncoder13Args)
-#    scalarEncoder14 = ScalarEncoder(**scalarEncoder14Args)  
-#    scalarEncoder15 = ScalarEncoder(**scalarEncoder15Args)  
+    scalarEncoder1 = ScalarEncoder(**scalarEncoder1Args)  
     dateEncoder = DateEncoder(**dateEncoderArgs)
 
     encoder = MultiEncoder()
     encoder.addEncoder(scalarEncoder1Args["name"], scalarEncoder1)
-    encoder.addEncoder(scalarEncoder2Args["name"], scalarEncoder2)
-    encoder.addEncoder(scalarEncoder3Args["name"], scalarEncoder3)
-    encoder.addEncoder(scalarEncoder4Args["name"], scalarEncoder4)
-    encoder.addEncoder(scalarEncoder5Args["name"], scalarEncoder5)
-    encoder.addEncoder(scalarEncoder6Args["name"], scalarEncoder6)
-    encoder.addEncoder(scalarEncoder7Args["name"], scalarEncoder7)
-    encoder.addEncoder(scalarEncoder8Args["name"], scalarEncoder8)
-    encoder.addEncoder(scalarEncoder9Args["name"], scalarEncoder9)
-    encoder.addEncoder(scalarEncoder10Args["name"], scalarEncoder10)
-    encoder.addEncoder(scalarEncoder11Args["name"], scalarEncoder11)
-    encoder.addEncoder(scalarEncoder12Args["name"], scalarEncoder12)
-#    encoder.addEncoder(scalarEncoder13Args["name"], scalarEncoder13)
-#    encoder.addEncoder(scalarEncoder14Args["name"], scalarEncoder14)
-#    encoder.addEncoder(scalarEncoder15Args["name"], scalarEncoder15)
     encoder.addEncoder(dateEncoderArgs["name"], dateEncoder)
 
     network = Network()
@@ -180,7 +138,7 @@ def plot_chemical_data(matte_cu,
                        bath_t,
                        freeboard_t,
                        date,
-                       buffer_size=800):
+                       buffer_size=500):
     # sliding
     if len(matte_cu) > buffer_size:
         new_matte_cu = matte_cu[-buffer_size:]        
@@ -218,7 +176,7 @@ def plot_input_data(lance_air,
                     use_anomalies3,
                     use_anomalies4,
                     date, 
-                    buffer_size=800):
+                    buffer_size=500):
     
     if len(lance_air) > buffer_size:
         new_lance_air = lance_air[-buffer_size:]
@@ -244,7 +202,7 @@ def plot_input_data(lance_air,
 
 def plot_anomaly_data(anomalies_history, 
                       date, 
-                      buffer_size=800):
+                      buffer_size=500):
     
     if len(anomalies_history) > buffer_size:
         new_anomalies_history = anomalies_history[-buffer_size:]
@@ -254,9 +212,45 @@ def plot_anomaly_data(anomalies_history,
         return anomalies_history, date
     
     
-def runNetwork(network, date1, input_data_file):
-    sensorRegion = network.regions["sensor"]
-    anomalyLikelihoodRegion = network.regions["anomalyLikelihoodRegion"]
+def runNetwork(network1,
+               network2,
+               network3,
+               network4,
+               network5,
+               network6,
+               network7,
+               network8,
+               network9,
+               network10,
+               network11,
+               network12,
+               date1, 
+               input_data_file):
+    
+    sensorRegion1 = network1.regions["sensor"]
+    anomalyLikelihoodRegion1 = network1.regions["anomalyLikelihoodRegion"]
+    sensorRegion2 = network2.regions["sensor"]
+    anomalyLikelihoodRegion2 = network2.regions["anomalyLikelihoodRegion"]
+    sensorRegion3 = network3.regions["sensor"]
+    anomalyLikelihoodRegion3 = network3.regions["anomalyLikelihoodRegion"]
+    sensorRegion4 = network4.regions["sensor"]
+    anomalyLikelihoodRegion4 = network4.regions["anomalyLikelihoodRegion"]
+    sensorRegion5 = network5.regions["sensor"]
+    anomalyLikelihoodRegion5 = network5.regions["anomalyLikelihoodRegion"]
+    sensorRegion6 = network6.regions["sensor"]
+    anomalyLikelihoodRegion6 = network6.regions["anomalyLikelihoodRegion"]
+    sensorRegion7 = network7.regions["sensor"]
+    anomalyLikelihoodRegion7 = network7.regions["anomalyLikelihoodRegion"]
+    sensorRegion8 = network8.regions["sensor"]
+    anomalyLikelihoodRegion8 = network8.regions["anomalyLikelihoodRegion"]
+    sensorRegion9 = network9.regions["sensor"]
+    anomalyLikelihoodRegion9 = network9.regions["anomalyLikelihoodRegion"]
+    sensorRegion10 = network10.regions["sensor"]
+    anomalyLikelihoodRegion10 = network10.regions["anomalyLikelihoodRegion"]
+    sensorRegion11 = network11.regions["sensor"]
+    anomalyLikelihoodRegion11 = network11.regions["anomalyLikelihoodRegion"]   
+    sensorRegion12 = network12.regions["sensor"]
+    anomalyLikelihoodRegion12 = network12.regions["anomalyLikelihoodRegion"]   
 
     # output data
     date = []
@@ -333,21 +327,67 @@ def runNetwork(network, date1, input_data_file):
     plot.subplots(ncols=2, nrows=3)
     
     for i in xrange(_NUM_RECORDS):
-        network.run(1)
-        anomalyLikelihood = anomalyLikelihoodRegion.getOutputData("anomalyLikelihood")[0]
-        pre1_1 = sensorRegion.getOutputData("sourceOut")[0]
-        pre2_1 = sensorRegion.getOutputData("sourceOut")[1]
-        pre3_1 = sensorRegion.getOutputData("sourceOut")[2]
-        pre4_1 = sensorRegion.getOutputData("sourceOut")[3]
-        pre5_1 = sensorRegion.getOutputData("sourceOut")[4]
-        pre6_1 = sensorRegion.getOutputData("sourceOut")[5]
-        pre7_1 = sensorRegion.getOutputData("sourceOut")[6]
-        pre8_1 = sensorRegion.getOutputData("sourceOut")[7]
-        pre9_1 = sensorRegion.getOutputData("sourceOut")[8]
-        pre10_1 = sensorRegion.getOutputData("sourceOut")[9]
-        pre11_1 = sensorRegion.getOutputData("sourceOut")[10]
-        pre12_1 = sensorRegion.getOutputData("sourceOut")[11]
+        network1.run(1)
+        anomalyLikelihood1 = anomalyLikelihoodRegion1.getOutputData("anomalyLikelihood")[0]
+        pre1_1 = sensorRegion1.getOutputData("sourceOut")[0]
         
+        network2.run(1)
+        anomalyLikelihood2 = anomalyLikelihoodRegion2.getOutputData("anomalyLikelihood")[0]
+        pre2_1 = sensorRegion2.getOutputData("sourceOut")[0]
+        
+        network3.run(1)
+        anomalyLikelihood3 = anomalyLikelihoodRegion3.getOutputData("anomalyLikelihood")[0]
+        pre3_1 = sensorRegion3.getOutputData("sourceOut")[0]
+        
+        network4.run(1)
+        anomalyLikelihood4 = anomalyLikelihoodRegion4.getOutputData("anomalyLikelihood")[0]
+        pre4_1 = sensorRegion4.getOutputData("sourceOut")[0]
+        
+        network5.run(1)
+        anomalyLikelihood5 = anomalyLikelihoodRegion5.getOutputData("anomalyLikelihood")[0]
+        pre5_1 = sensorRegion5.getOutputData("sourceOut")[0]
+        
+        network6.run(1)
+        anomalyLikelihood6 = anomalyLikelihoodRegion6.getOutputData("anomalyLikelihood")[0]
+        pre6_1 = sensorRegion6.getOutputData("sourceOut")[0]
+        
+        network7.run(1)
+        anomalyLikelihood7 = anomalyLikelihoodRegion7.getOutputData("anomalyLikelihood")[0]
+        pre7_1 = sensorRegion7.getOutputData("sourceOut")[0]
+        
+        network8.run(1)
+        anomalyLikelihood8 = anomalyLikelihoodRegion8.getOutputData("anomalyLikelihood")[0]
+        pre8_1 = sensorRegion8.getOutputData("sourceOut")[0]
+        
+        network9.run(1)
+        anomalyLikelihood9 = anomalyLikelihoodRegion9.getOutputData("anomalyLikelihood")[0]
+        pre9_1 = sensorRegion9.getOutputData("sourceOut")[0]
+        
+        network10.run(1)
+        anomalyLikelihood10 = anomalyLikelihoodRegion10.getOutputData("anomalyLikelihood")[0]
+        pre10_1 = sensorRegion10.getOutputData("sourceOut")[0]
+        
+        network11.run(1)
+        anomalyLikelihood11 = anomalyLikelihoodRegion11.getOutputData("anomalyLikelihood")[0]
+        pre11_1 = sensorRegion11.getOutputData("sourceOut")[0]
+        
+        network12.run(1)
+        anomalyLikelihood12 = anomalyLikelihoodRegion12.getOutputData("anomalyLikelihood")[0]
+        pre12_1 = sensorRegion12.getOutputData("sourceOut")[0]
+        
+        avg_anomaly_likelihood = mean([anomalyLikelihood1,
+                                       anomalyLikelihood2,
+                                       anomalyLikelihood3,
+                                       anomalyLikelihood4,
+                                       anomalyLikelihood5,
+                                       anomalyLikelihood6,
+                                       anomalyLikelihood7,
+                                       anomalyLikelihood8,
+                                       anomalyLikelihood9,
+                                       anomalyLikelihood10,
+                                       anomalyLikelihood11,
+                                       anomalyLikelihood12])
+
         matte_cu.append(pre1_1)
         matte_fe.append(pre2_1)
         matte_pb.append(pre3_1)
@@ -384,27 +424,100 @@ def runNetwork(network, date1, input_data_file):
 #        print "        Fe:       \t", pre6_1
 #        print "        SiO2:     \t", pre7_1
 
-        if anomalyLikelihood < 0.85:
-#            print "        \033[1;42m GOOD CONDITION \033[0m"
-            previous_result = 'G'
-#            status_records.append('G')
-            plt_bad_records.append(0)
-            status_table_content[0][0] = date1[i]
-            status_table_content[0][1] = 'GOOD CONDITION'
-            status_table_color[0][1] = '#31de5f'
-            status_table_content[0][2] = anomalyLikelihood
-            status_table_color[0][2] = 'w'
-        elif anomalyLikelihood >=0.85 and anomalyLikelihood < 0.94:
-#            print "        \033[1;43m WARNING CAUTION \033[0m"
-            previous_result = 'W'
-#            status_records.append('W')
-            plt_bad_records.append(0)
-            status_table_content[0][0] = date1[i]
-            status_table_content[0][1] = 'WARNING CAUTION'
-            status_table_color[0][1] = '#ff9e36'
-            status_table_content[0][2] = anomalyLikelihood
-            status_table_color[0][2] = 'w'
-        else:
+#        if avg_anomaly_likelihood < 0.85:
+##            print "        \033[1;42m GOOD CONDITION \033[0m"
+#            previous_result = 'G'
+##            status_records.append('G')
+#            plt_bad_records.append(0)
+#            status_table_content[0][0] = date1[i]
+#            status_table_content[0][1] = 'GOOD CONDITION'
+#            status_table_color[0][1] = '#31de5f'
+#            status_table_content[0][2] = avg_anomaly_likelihood
+#            status_table_color[0][2] = 'w'
+#        elif avg_anomaly_likelihood >=0.85 and avg_anomaly_likelihood < 0.94:
+##            print "        \033[1;43m WARNING CAUTION \033[0m"
+#            previous_result = 'W'
+##            status_records.append('W')
+#            plt_bad_records.append(0)
+#            status_table_content[0][0] = date1[i]
+#            status_table_content[0][1] = 'WARNING CAUTION'
+#            status_table_color[0][1] = '#ff9e36'
+#            status_table_content[0][2] = avg_anomaly_likelihood
+#            status_table_color[0][2] = 'w'
+#        else:
+#            if previous_result == 'D':
+#                contineous_flag = True
+#            else:
+#                contineous_flag = False
+#
+#            if table_content[0][0] == ' ' and contineous_flag == False:
+#                table_content[0][0] = date1[i]
+#                table_content[0][1] = str(avg_anomaly_likelihood) + ' (B)'
+#                table_content[0][2] = float(0)
+#            elif table_content[1][0] == ' ' and contineous_flag == False:
+#                table_content[1][0] = date1[i]
+#                table_content[1][1] = str(avg_anomaly_likelihood) + ' (B)'
+#                table_content[1][2] = float(0)
+#            elif table_content[2][0] == ' ' and contineous_flag == False:
+#                table_content[2][0] = date1[i]
+#                table_content[2][1] = str(avg_anomaly_likelihood) + ' (B)'
+#                table_content[2][2] = float(0)
+#            elif table_content[3][0] == ' ' and contineous_flag == False:
+#                table_content[3][0] = date1[i]
+#                table_content[3][1] = str(avg_anomaly_likelihood) + ' (B)'
+#                table_content[3][2] = float(0)         
+#            elif table_content[1][0] == ' ' and contineous_flag == True:
+#                table_content[0][0] = date1[i]
+#                table_content[0][1] = str(avg_anomaly_likelihood) + ' (B)'
+#                table_content[0][2] += seconds_difference(date1[i-1], date1[i])
+#            elif table_content[2][0] == ' ' and contineous_flag == True:
+#                table_content[1][0] = date1[i]
+#                table_content[1][1] = str(avg_anomaly_likelihood) + ' (B)'
+#                table_content[1][2] += seconds_difference(date1[i-1], date1[i])
+#            elif table_content[3][0] == ' ' and contineous_flag == True:
+#                table_content[2][0] = date1[i]
+#                table_content[2][1] = str(avg_anomaly_likelihood) + ' (B)'
+#                table_content[2][2] += seconds_difference(date1[i-1], date1[i])
+#            elif table_content[0][0] != ' ' and table_content[1][0] != ' ' and table_content[2][0] != ' ' and table_content[3][0] != ' ' and contineous_flag == False:
+#                table_content[0][0] = table_content[1][0]
+#                table_content[0][1] = table_content[1][1]
+#                table_content[0][2] = table_content[1][2]
+#                
+#                table_content[1][0] = table_content[2][0]
+#                table_content[1][1] = table_content[2][1]
+#                table_content[1][2] = table_content[2][2]
+#                
+#                table_content[2][0] = table_content[3][0]
+#                table_content[2][1] = table_content[3][1]
+#                table_content[2][2] = table_content[3][2]
+#                
+#                table_content[3][0] = date1[i]
+#                table_content[3][1] = str(avg_anomaly_likelihood) + ' (B)'
+#                table_content[3][2] = 0
+#            elif table_content[0][0] != ' ' and table_content[1][0] != ' ' and table_content[2][0] != ' ' and table_content[3][0] != ' ' and contineous_flag == True:                
+#                table_content[3][0] = date1[i]
+#                table_content[3][1] = str(avg_anomaly_likelihood) + ' (B)'
+#                table_content[3][2] += seconds_difference(date1[i-1], date1[i])   
+##            print "        \033[1;41m DANGEROUS CONDITION \033[0m"
+#            previous_result = 'D'
+##            status_records.append('D')
+#            plt_bad_records.append(1)
+#            status_table_content[0][0] = date1[i]
+#            status_table_content[0][1] = 'BAD CONDITION'
+#            status_table_color[0][1] = '#db4439'
+#            status_table_content[0][2] = avg_anomaly_likelihood
+#            status_table_color[0][2] = 'w'
+##        print "\n"
+
+
+        if avg_anomaly_likelihood > 0.9 or anomalyLikelihood1 > 0.999 \
+            or anomalyLikelihood2 > 0.999 or anomalyLikelihood3 > 0.999 \
+            or anomalyLikelihood4 > 0.999 or anomalyLikelihood5 > 0.999 \
+            or anomalyLikelihood6 > 0.999 or anomalyLikelihood7 > 0.999 \
+            or anomalyLikelihood8 > 0.999 or anomalyLikelihood9 > 0.999 \
+            or anomalyLikelihood10 > 0.999 or anomalyLikelihood11 > 0.999 \
+            or anomalyLikelihood12 > 0.999:
+            
             if previous_result == 'D':
                 contineous_flag = True
             else:
@@ -412,31 +525,31 @@ def runNetwork(network, date1, input_data_file):
 
             if table_content[0][0] == ' ' and contineous_flag == False:
                 table_content[0][0] = date1[i]
-                table_content[0][1] = str(anomalyLikelihood) + ' (B)'
+                table_content[0][1] = str(avg_anomaly_likelihood) + ' (B)'
                 table_content[0][2] = float(0)
             elif table_content[1][0] == ' ' and contineous_flag == False:
                 table_content[1][0] = date1[i]
-                table_content[1][1] = str(anomalyLikelihood) + ' (B)'
+                table_content[1][1] = str(avg_anomaly_likelihood) + ' (B)'
                 table_content[1][2] = float(0)
             elif table_content[2][0] == ' ' and contineous_flag == False:
                 table_content[2][0] = date1[i]
-                table_content[2][1] = str(anomalyLikelihood) + ' (B)'
+                table_content[2][1] = str(avg_anomaly_likelihood) + ' (B)'
                 table_content[2][2] = float(0)
             elif table_content[3][0] == ' ' and contineous_flag == False:
                 table_content[3][0] = date1[i]
-                table_content[3][1] = str(anomalyLikelihood) + ' (B)'
+                table_content[3][1] = str(avg_anomaly_likelihood) + ' (B)'
                 table_content[3][2] = float(0)         
             elif table_content[1][0] == ' ' and contineous_flag == True:
                 table_content[0][0] = date1[i]
-                table_content[0][1] = str(anomalyLikelihood) + ' (B)'
+                table_content[0][1] = str(avg_anomaly_likelihood) + ' (B)'
                 table_content[0][2] += seconds_difference(date1[i-1], date1[i])
             elif table_content[2][0] == ' ' and contineous_flag == True:
                 table_content[1][0] = date1[i]
-                table_content[1][1] = str(anomalyLikelihood) + ' (B)'
+                table_content[1][1] = str(avg_anomaly_likelihood) + ' (B)'
                 table_content[1][2] += seconds_difference(date1[i-1], date1[i])
             elif table_content[3][0] == ' ' and contineous_flag == True:
                 table_content[2][0] = date1[i]
-                table_content[2][1] = str(anomalyLikelihood) + ' (B)'
+                table_content[2][1] = str(avg_anomaly_likelihood) + ' (B)'
                 table_content[2][2] += seconds_difference(date1[i-1], date1[i])
             elif table_content[0][0] != ' ' and table_content[1][0] != ' ' and table_content[2][0] != ' ' and table_content[3][0] != ' ' and contineous_flag == False:
                 table_content[0][0] = table_content[1][0]
@@ -452,22 +565,46 @@ def runNetwork(network, date1, input_data_file):
                 table_content[2][2] = table_content[3][2]
                 
                 table_content[3][0] = date1[i]
-                table_content[3][1] = str(anomalyLikelihood) + ' (B)'
+                table_content[3][1] = str(avg_anomaly_likelihood) + ' (B)'
                 table_content[3][2] = 0
             elif table_content[0][0] != ' ' and table_content[1][0] != ' ' and table_content[2][0] != ' ' and table_content[3][0] != ' ' and contineous_flag == True:                
                 table_content[3][0] = date1[i]
-                table_content[3][1] = str(anomalyLikelihood) + ' (B)'
+                table_content[3][1] = str(avg_anomaly_likelihood) + ' (B)'
                 table_content[3][2] += seconds_difference(date1[i-1], date1[i])   
-#            print "        \033[1;41m DANGEROUS CONDITION \033[0m"
             previous_result = 'D'
-#            status_records.append('D')
             plt_bad_records.append(1)
             status_table_content[0][0] = date1[i]
             status_table_content[0][1] = 'BAD CONDITION'
             status_table_color[0][1] = '#db4439'
-            status_table_content[0][2] = anomalyLikelihood
+            status_table_content[0][2] = avg_anomaly_likelihood
+            status_table_color[0][2] = 'w'        
+        
+        elif avg_anomaly_likelihood > 0.8 or anomalyLikelihood1 > 0.9 \
+            or anomalyLikelihood2 > 0.9 or anomalyLikelihood3 > 0.9 \
+            or anomalyLikelihood4 > 0.9 or anomalyLikelihood5 > 0.9 \
+            or anomalyLikelihood6 > 0.9 or anomalyLikelihood7 > 0.9 \
+            or anomalyLikelihood8 > 0.9 or anomalyLikelihood9 > 0.9 \
+            or anomalyLikelihood10 > 0.9 or anomalyLikelihood11 > 0.9 \
+            or anomalyLikelihood12 > 0.9:
+                
+            previous_result = 'W'
+            plt_bad_records.append(0)
+            status_table_content[0][0] = date1[i]
+            status_table_content[0][1] = 'WARNING CAUTION'
+            status_table_color[0][1] = '#ff9e36'
+            status_table_content[0][2] = avg_anomaly_likelihood
             status_table_color[0][2] = 'w'
-#        print "\n"        
+            
+        else:
+            previous_result = 'G'
+            plt_bad_records.append(0)
+            status_table_content[0][0] = date1[i]
+            status_table_content[0][1] = 'GOOD CONDITION'
+            status_table_color[0][1] = '#31de5f'
+            status_table_content[0][2] = avg_anomaly_likelihood
+            status_table_color[0][2] = 'w'            
+                
+            
 
         plt_matte_cu, plt_matte_fe, plt_matte_pb, plt_matte_zn, plt_slag_cu, \
         plt_slag_fe, plt_slag_pb, plt_slag_zn, \
@@ -504,59 +641,59 @@ def runNetwork(network, date1, input_data_file):
         plt2_bad_records, plt2_bad_date = plot_anomaly_data(plt_bad_records, date)
 
         # display the input data
+        ax5 = plot.add_subplot(6,5,5)
+        ax5.set_xticks([])
+        ax5.plot(plt2_date, plt2_lance_air, "y--", linewidth=1)
+        ax5.set_title('Lance Air\n')
+        
         ax1 = plot.add_subplot(6,5,1)
         ax1.set_xticks([])
-        ax1.plot(plt2_date, plt2_lance_air, "y--", linewidth=1)
-        ax1.set_title('Lance Air\n')
+        ax1.plot(plt2_date, plt2_actual_moisture1, "y--", linewidth=1)
+        ax1.set_title('Actual Moisture 1\n')
         
         ax2 = plot.add_subplot(6,5,2)
         ax2.set_xticks([])
-        ax2.plot(plt2_date, plt2_actual_moisture1, "y--", linewidth=1)
-        ax2.set_title('Actual Moisture 1\n')
-        
-        ax3 = plot.add_subplot(6,5,3)
-        ax3.set_xticks([])
-        ax3.plot(plt2_date, plt2_actual_moisture2, "y--", linewidth=1)
-        ax3.set_title('Actual Moisture 2\n')
-        
-        ax4 = plot.add_subplot(6,5,4)
-        ax4.set_xticks([])
-        ax4.plot(plt2_date, plt2_lance_oxy, "y--", linewidth=1)
-        ax4.set_title('Lance Oxygen\n')
-        
-        ax5 = plot.add_subplot(6,5,5)
-        ax5.set_xticks([])
-        ax5.plot(plt2_date, plt2_actual_conc, "y--", linewidth=1)
-        ax5.set_title('Actual Conc\n')
-        
-        ax6 = plot.add_subplot(6,5,6)
-        ax6.set_xticks([])
-        ax6.plot(plt2_date, plt2_actual_feed, "y--", linewidth=1)
-        ax6.set_title('Actual Feed\n')
-        
-        ax7 = plot.add_subplot(6,5,7)
-        ax7.set_xticks([])
-        ax7.plot(plt2_date, plt2_use_anomalies1, "g-", linewidth=2)
-        ax7.plot(plt2_bad_date, plt2_bad_records, "r-", linewidth=1)
-        ax7.set_title('(EVA) Moisture 1 AF\n')
-        
-        ax8 = plot.add_subplot(6,5,8)
-        ax8.set_xticks([])
-        ax8.plot(plt2_date, plt2_use_anomalies2, "g-", linewidth=2)
-        ax8.plot(plt2_bad_date, plt2_bad_records, "r-", linewidth=1)
-        ax8.set_title('(EVA) Moisture 2 AF\n')
-        
-        ax9 = plot.add_subplot(6,5,9)
-        ax9.set_xticks([])
-        ax9.plot(plt2_date, plt2_use_anomalies3, "g-", linewidth=2)
-        ax9.plot(plt2_bad_date, plt2_bad_records, "r-", linewidth=1)
-        ax9.set_title('(EVA) Blend AF\n')
+        ax2.plot(plt2_date, plt2_actual_moisture2, "y--", linewidth=1)
+        ax2.set_title('Actual Moisture 2\n')
         
         ax10 = plot.add_subplot(6,5,10)
         ax10.set_xticks([])
-        ax10.plot(plt2_date, plt2_use_anomalies4, "g-", linewidth=2)
-        ax10.plot(plt2_bad_date, plt2_bad_records, "r-", linewidth=1)
-        ax10.set_title('(EVA) Feed AF\n')
+        ax10.plot(plt2_date, plt2_lance_oxy, "y--", linewidth=1)
+        ax10.set_title('Lance Oxygen\n')
+        
+        ax3 = plot.add_subplot(6,5,3)
+        ax3.set_xticks([])
+        ax3.plot(plt2_date, plt2_actual_conc, "y--", linewidth=1)
+        ax3.set_title('Actual Conc\n')
+        
+        ax4 = plot.add_subplot(6,5,4)
+        ax4.set_xticks([])
+        ax4.plot(plt2_date, plt2_actual_feed, "y--", linewidth=1)
+        ax4.set_title('Actual Feed\n')
+        
+        ax6 = plot.add_subplot(6,5,6)
+        ax6.set_xticks([])
+        ax6.plot(plt2_date, plt2_use_anomalies1, "g-", linewidth=2)
+        ax6.plot(plt2_bad_date, plt2_bad_records, "r-", linewidth=1)
+        ax6.set_title('(EVA) Moisture 1 AF\n')
+        
+        ax7 = plot.add_subplot(6,5,7)
+        ax7.set_xticks([])
+        ax7.plot(plt2_date, plt2_use_anomalies2, "g-", linewidth=2)
+        ax7.plot(plt2_bad_date, plt2_bad_records, "r-", linewidth=1)
+        ax7.set_title('(EVA) Moisture 2 AF\n')
+        
+        ax8 = plot.add_subplot(6,5,8)
+        ax8.set_xticks([])
+        ax8.plot(plt2_date, plt2_use_anomalies3, "g-", linewidth=2)
+        ax8.plot(plt2_bad_date, plt2_bad_records, "r-", linewidth=1)
+        ax8.set_title('(EVA) Blend AF\n')
+        
+        ax9 = plot.add_subplot(6,5,9)
+        ax9.set_xticks([])
+        ax9.plot(plt2_date, plt2_use_anomalies4, "g-", linewidth=2)
+        ax9.plot(plt2_bad_date, plt2_bad_records, "r-", linewidth=1)
+        ax9.set_title('(EVA) Feed AF\n')
         
         # Chemical plot
         ax11 = plot.add_subplot(6,5,11)
@@ -655,23 +792,39 @@ def runNetwork(network, date1, input_data_file):
 #        print "When < Use nominals = 0 >, top-1: ", u0_top_1, " ; top-2: ", u0_top_2
 #        print "\n"
         
+        # print real-time evaluation results
+        print "anomalyLikelihood1 :", anomalyLikelihood1
+        print "anomalyLikelihood2 :", anomalyLikelihood2
+        print "anomalyLikelihood3 :", anomalyLikelihood3
+        print "anomalyLikelihood4 :", anomalyLikelihood4
+        print "anomalyLikelihood5 :", anomalyLikelihood5
+        print "anomalyLikelihood6 :", anomalyLikelihood6
+        print "anomalyLikelihood7 :", anomalyLikelihood7
+        print "anomalyLikelihood8 :", anomalyLikelihood8
+        print "anomalyLikelihood9 :", anomalyLikelihood9
+        print "anomalyLikelihood10 :", anomalyLikelihood10
+        print "anomalyLikelihood11 :", anomalyLikelihood11
+        print "anomalyLikelihood12 :", anomalyLikelihood12
+        print "\n"
+
+        
         plot.show()
         plt.pause(1e-17)
         
-        time.sleep(0.1)
+        time.sleep(0.01)
         plot.clf()
 
 
 if __name__ == "__main__":
     
     # Simulation data    
-    output_data_feed_rate = '/media/tpc2/DATA/chemical_data/2nd round/output_file_2.csv'
-    input_data_feed_rate = '/media/tpc2/DATA/chemical_data/2nd round/input_file_2.csv'
+    output_data = '/media/tpc2/DATA/chemical_data/2nd round/output_file_2.csv'
+    input_data = '/media/tpc2/DATA/chemical_data/2nd round/input_file_2.csv'
     
-    # Global parameters
+    # Global parameters here
     _VERBOSITY = 0
-    _NUM_RECORDS = 6002 - 3
-    
+    _NUM_RECORDS = 5914 - 3
+    _TIMEOFDAY = (21, 8)
     # -------------------------------------------------------------------------
     #
     #
@@ -730,11 +883,28 @@ if __name__ == "__main__":
       "clipInput": True,
       "forced": False,
     }
+    
+    dateEncoder1Args = {
+      "season": 0,
+      "dayOfWeek": 0,
+      "weekend": 0,
+      "holiday": 0,
+      "timeOfDay": _TIMEOFDAY,
+      "customDays": 0,
+      "name": "Time",
+      "forced": False
+    }
+    
+    MatteCu_recordParams = {
+      "inputFilePath": output_data,
+      "scalarEncoder1Args": scalarEncoder1Args,
+      "dateEncoderArgs": dateEncoder1Args,
+    }
         
     scalarEncoder2Args = {
       "w": 21,
-      "minval": 10.45 - 0.5,
-      "maxval": 10.45 + 0.5,
+      "minval": 10.45 - 0.3,
+      "maxval": 10.45 + 0.8,
       "periodic": False,
       "n": 50,
       "radius": 0,
@@ -745,10 +915,27 @@ if __name__ == "__main__":
       "forced": False,
     }
     
+    dateEncoder2Args = {
+      "season": 0,
+      "dayOfWeek": 0,
+      "weekend": 0,
+      "holiday": 0,
+      "timeOfDay": _TIMEOFDAY,
+      "customDays": 0,
+      "name": "Time",
+      "forced": False
+    }
+    
+    MatteFe_recordParams = {
+      "inputFilePath": output_data,
+      "scalarEncoder1Args": scalarEncoder2Args,
+      "dateEncoderArgs": dateEncoder2Args,
+    }
+    
     scalarEncoder3Args = {
       "w": 21,
-      "minval": 0.6 - 0.15,
-      "maxval": 0.6 + 0.15,
+      "minval": 0.6 - 0.1,
+      "maxval": 0.6 + 0.1,
       "periodic": False,
       "n": 50,
       "radius": 0,
@@ -757,6 +944,23 @@ if __name__ == "__main__":
       "verbosity": 0,
       "clipInput": True,
       "forced": False,
+    }
+    
+    dateEncoder3Args = {
+      "season": 0,
+      "dayOfWeek": 0,
+      "weekend": 0,
+      "holiday": 0,
+      "timeOfDay": _TIMEOFDAY,
+      "customDays": 0,
+      "name": "Time",
+      "forced": False
+    }
+    
+    MattePb_recordParams = {
+      "inputFilePath": output_data,
+      "scalarEncoder1Args": scalarEncoder3Args,
+      "dateEncoderArgs": dateEncoder3Args,
     }
 
     scalarEncoder4Args = {
@@ -773,6 +977,23 @@ if __name__ == "__main__":
       "forced": False,
     }
     
+    dateEncoder4Args = {
+      "season": 0,
+      "dayOfWeek": 0,
+      "weekend": 0,
+      "holiday": 0,
+      "timeOfDay": _TIMEOFDAY,
+      "customDays": 0,
+      "name": "Time",
+      "forced": False
+    }
+    
+    MatteZn_recordParams = {
+      "inputFilePath": output_data,
+      "scalarEncoder1Args": scalarEncoder4Args,
+      "dateEncoderArgs": dateEncoder4Args,
+    }
+    
     scalarEncoder5Args = {
       "w": 21,
       "minval": 0.129 - 0.01,
@@ -786,11 +1007,28 @@ if __name__ == "__main__":
       "clipInput": True,
       "forced": False,
     }
+    
+    dateEncoder5Args = {
+      "season": 0,
+      "dayOfWeek": 0,
+      "weekend": 0,
+      "holiday": 0,
+      "timeOfDay": _TIMEOFDAY,
+      "customDays": 0,
+      "name": "Time",
+      "forced": False
+    }
+    
+    SlagCu_recordParams = {
+      "inputFilePath": output_data,
+      "scalarEncoder1Args": scalarEncoder5Args,
+      "dateEncoderArgs": dateEncoder5Args,
+    }
 
     scalarEncoder6Args = {
       "w": 21,
-      "minval": 37.95 - 0.08,
-      "maxval": 37.95 + 0.08,
+      "minval": 37.95 - 0.1,
+      "maxval": 37.95 + 0.1,
       "periodic": False,
       "n": 50,
       "radius": 0,
@@ -801,6 +1039,23 @@ if __name__ == "__main__":
       "forced": False,
     }
 
+    dateEncoder6Args = {
+      "season": 0,
+      "dayOfWeek": 0,
+      "weekend": 0,
+      "holiday": 0,
+      "timeOfDay": _TIMEOFDAY,
+      "customDays": 0,
+      "name": "Time",
+      "forced": False
+    }
+    
+    SlagFe_recordParams = {
+      "inputFilePath": output_data,
+      "scalarEncoder1Args": scalarEncoder6Args,
+      "dateEncoderArgs": dateEncoder6Args,
+    }
+    
     scalarEncoder7Args = {
       "w": 21,
       "minval": 0.35 - 0.08,
@@ -815,6 +1070,23 @@ if __name__ == "__main__":
       "forced": False,
     }
 
+    dateEncoder7Args = {
+      "season": 0,
+      "dayOfWeek": 0,
+      "weekend": 0,
+      "holiday": 0,
+      "timeOfDay": _TIMEOFDAY,
+      "customDays": 0,
+      "name": "Time",
+      "forced": False
+    }
+    
+    SlagPb_recordParams = {
+      "inputFilePath": output_data,
+      "scalarEncoder1Args": scalarEncoder7Args,
+      "dateEncoderArgs": dateEncoder7Args,
+    }
+    
     scalarEncoder8Args = {
       "w": 21,
       "minval": 2.04 - 0.05,
@@ -827,6 +1099,23 @@ if __name__ == "__main__":
       "verbosity": 0,
       "clipInput": True,
       "forced": False,
+    }
+
+    dateEncoder8Args = {
+      "season": 0,
+      "dayOfWeek": 0,
+      "weekend": 0,
+      "holiday": 0,
+      "timeOfDay": _TIMEOFDAY,
+      "customDays": 0,
+      "name": "Time",
+      "forced": False
+    }
+    
+    SlagZn_recordParams = {
+      "inputFilePath": output_data,
+      "scalarEncoder1Args": scalarEncoder8Args,
+      "dateEncoderArgs": dateEncoder8Args,
     }
     
     scalarEncoder9Args = {
@@ -843,6 +1132,23 @@ if __name__ == "__main__":
       "forced": False,
     }
 
+    dateEncoder9Args = {
+      "season": 0,
+      "dayOfWeek": 0,
+      "weekend": 0,
+      "holiday": 0,
+      "timeOfDay": _TIMEOFDAY,
+      "customDays": 0,
+      "name": "Time",
+      "forced": False
+    }
+    
+    FeSiO2_recordParams = {
+      "inputFilePath": output_data,
+      "scalarEncoder1Args": scalarEncoder9Args,
+      "dateEncoderArgs": dateEncoder9Args,
+    }
+    
     scalarEncoder10Args = {
       "w": 21,
       "minval": 5.0 - 0.1,
@@ -857,10 +1163,27 @@ if __name__ == "__main__":
       "forced": False,
     }
 
+    dateEncoder10Args = {
+      "season": 0,
+      "dayOfWeek": 0,
+      "weekend": 0,
+      "holiday": 0,
+      "timeOfDay": _TIMEOFDAY,
+      "customDays": 0,
+      "name": "Time",
+      "forced": False
+    }
+    
+    SlagCaO_recordParams = {
+      "inputFilePath": output_data,
+      "scalarEncoder1Args": scalarEncoder10Args,
+      "dateEncoderArgs": dateEncoder10Args,
+    }
+    
     scalarEncoder11Args = {
       "w": 21,
-      "minval": 1200 - 15,
-      "maxval": 1200 + 15,
+      "minval": 1200 - 20,
+      "maxval": 1200 + 20,
       "periodic": False,
       "n": 50,
       "radius": 0,
@@ -871,6 +1194,23 @@ if __name__ == "__main__":
       "forced": False,
     }
 
+    dateEncoder11Args = {
+      "season": 0,
+      "dayOfWeek": 0,
+      "weekend": 0,
+      "holiday": 0,
+      "timeOfDay": _TIMEOFDAY,
+      "customDays": 0,
+      "name": "Time",
+      "forced": False
+    }
+    
+    BathT_recordParams = {
+      "inputFilePath": output_data,
+      "scalarEncoder1Args": scalarEncoder11Args,
+      "dateEncoderArgs": dateEncoder11Args,
+    }
+    
     scalarEncoder12Args = {
       "w": 21,
       "minval": 1060 - 20,
@@ -885,46 +1225,100 @@ if __name__ == "__main__":
       "forced": False,
     }
         
-    dateEncoderArgs = {
+    dateEncoder12Args = {
       "season": 0,
       "dayOfWeek": 0,
       "weekend": 0,
       "holiday": 0,
-      "timeOfDay": (21, 4),
+      "timeOfDay": _TIMEOFDAY,
       "customDays": 0,
       "name": "Time",
       "forced": False
     }
 
-    chemical_recordParams = {
-      "inputFilePath": output_data_feed_rate,
-      "scalarEncoder1Args": scalarEncoder1Args,
-      "scalarEncoder2Args": scalarEncoder2Args,
-      "scalarEncoder3Args": scalarEncoder3Args,
-      "scalarEncoder4Args": scalarEncoder4Args,
-      "scalarEncoder5Args": scalarEncoder5Args,
-      "scalarEncoder6Args": scalarEncoder6Args,
-      "scalarEncoder7Args": scalarEncoder7Args,
-      "scalarEncoder8Args": scalarEncoder8Args,
-      "scalarEncoder9Args": scalarEncoder9Args,
-      "scalarEncoder10Args": scalarEncoder10Args,
-      "scalarEncoder11Args": scalarEncoder11Args,
-      "scalarEncoder12Args": scalarEncoder12Args,
-#      "scalarEncoder13Args": scalarEncoder13Args,
-#      "scalarEncoder14Args": scalarEncoder14Args,
-#      "scalarEncoder15Args": scalarEncoder15Args,
-      "dateEncoderArgs": dateEncoderArgs,
+    FreeboardT_recordParams = {
+      "inputFilePath": output_data,
+      "scalarEncoder1Args": scalarEncoder12Args,
+      "dateEncoderArgs": dateEncoder12Args,
     }
     
     #--------------------------------------------------------------------------
     #
     #
     # Generate networks and run them
-    chemical_network = createTemporalAnomaly_chemical(chemical_recordParams,
-                                                      spatialParams=_SP_PARAMS,
-                                                      temporalParams=_TM_PARAMS,
-                                                      verbosity=_VERBOSITY)
+    MatteCu_network = createTemporalAnomaly(MatteCu_recordParams,
+                                            spatialParams=_SP_PARAMS,
+                                            temporalParams=_TM_PARAMS,
+                                            verbosity=_VERBOSITY)
+
+    MatteFe_network = createTemporalAnomaly(MatteFe_recordParams,
+                                            spatialParams=_SP_PARAMS,
+                                            temporalParams=_TM_PARAMS,
+                                            verbosity=_VERBOSITY)
+
+    MattePb_network = createTemporalAnomaly(MattePb_recordParams,
+                                            spatialParams=_SP_PARAMS,
+                                            temporalParams=_TM_PARAMS,
+                                            verbosity=_VERBOSITY)
     
-    chemical_date = getDate(chemical_recordParams, _NUM_RECORDS)
+    MatteZn_network = createTemporalAnomaly(MatteZn_recordParams,
+                                            spatialParams=_SP_PARAMS,
+                                            temporalParams=_TM_PARAMS,
+                                            verbosity=_VERBOSITY)
     
-    runNetwork(chemical_network, chemical_date, input_data_feed_rate)
+    SlagCu_network = createTemporalAnomaly(SlagCu_recordParams,
+                                            spatialParams=_SP_PARAMS,
+                                            temporalParams=_TM_PARAMS,
+                                            verbosity=_VERBOSITY)
+    
+    SlagFe_network = createTemporalAnomaly(SlagFe_recordParams,
+                                            spatialParams=_SP_PARAMS,
+                                            temporalParams=_TM_PARAMS,
+                                            verbosity=_VERBOSITY)
+    
+    SlagPb_network = createTemporalAnomaly(SlagPb_recordParams,
+                                            spatialParams=_SP_PARAMS,
+                                            temporalParams=_TM_PARAMS,
+                                            verbosity=_VERBOSITY)
+    
+    SlagZn_network = createTemporalAnomaly(SlagZn_recordParams,
+                                            spatialParams=_SP_PARAMS,
+                                            temporalParams=_TM_PARAMS,
+                                            verbosity=_VERBOSITY)
+    
+    FeSiO2_network = createTemporalAnomaly(FeSiO2_recordParams,
+                                            spatialParams=_SP_PARAMS,
+                                            temporalParams=_TM_PARAMS,
+                                            verbosity=_VERBOSITY)
+    
+    SlagCaO_network = createTemporalAnomaly(SlagCaO_recordParams,
+                                            spatialParams=_SP_PARAMS,
+                                            temporalParams=_TM_PARAMS,
+                                            verbosity=_VERBOSITY)
+    
+    BathT_network = createTemporalAnomaly(BathT_recordParams,
+                                            spatialParams=_SP_PARAMS,
+                                            temporalParams=_TM_PARAMS,
+                                            verbosity=_VERBOSITY)
+    
+    FreeboardT_network = createTemporalAnomaly(FreeboardT_recordParams,
+                                            spatialParams=_SP_PARAMS,
+                                            temporalParams=_TM_PARAMS,
+                                            verbosity=_VERBOSITY)
+    
+    chemical_date = getDate(MatteCu_recordParams, _NUM_RECORDS)
+    
+    runNetwork(MatteCu_network,
+               MatteFe_network,
+               MattePb_network,
+               MatteZn_network,
+               SlagCu_network,
+               SlagFe_network,
+               SlagPb_network,
+               SlagZn_network,
+               FeSiO2_network,
+               SlagCaO_network,
+               BathT_network,
+               FreeboardT_network,
+               chemical_date, 
+               input_data)
