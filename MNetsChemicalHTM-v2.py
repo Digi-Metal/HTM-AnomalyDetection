@@ -17,7 +17,12 @@ from nupic.engine import Network
 from nupic.encoders import MultiEncoder, ScalarEncoder, DateEncoder
 
 
-def createTemporalAnomaly(recordParams, spatialParams, temporalParams, verbosity):
+def createTemporalAnomaly(recordParams, 
+                          spatialParams, 
+                          temporalParams, 
+                          verbosity, 
+                          use_saved_model,
+                          model_path):
 
     inputFilePath = recordParams["inputFilePath"]
     scalarEncoder1Args = recordParams["scalarEncoder1Args"]
@@ -31,62 +36,66 @@ def createTemporalAnomaly(recordParams, spatialParams, temporalParams, verbosity
     encoder.addEncoder(dateEncoderArgs["name"], dateEncoder)
 
     network = Network()
-
-    network.addRegion("sensor", "py.RecordSensor",
-                    json.dumps({"verbosity": verbosity}))
-
-    sensor = network.regions["sensor"].getSelf()
-    sensor.encoder = encoder
-    sensor.dataSource = FileRecordStream(streamID=inputFilePath)
-
-    # Create the spatial pooler region
-    spatialParams["inputWidth"] = sensor.encoder.getWidth()
-    network.addRegion("spatialPoolerRegion", "py.SPRegion",
-                      json.dumps(spatialParams))
-
-    # Link the SP region to the sensor input
-    network.link("sensor", "spatialPoolerRegion", "UniformLink", "")
-    network.link("sensor", "spatialPoolerRegion", "UniformLink", "",
-                 srcOutput="resetOut", destInput="resetIn")
-    network.link("spatialPoolerRegion", "sensor", "UniformLink", "",
-                 srcOutput="spatialTopDownOut", destInput="spatialTopDownIn")
-    network.link("spatialPoolerRegion", "sensor", "UniformLink", "",
-                 srcOutput="temporalTopDownOut", destInput="temporalTopDownIn")
-
-    # Add the TPRegion on top of the SPRegion
-    network.addRegion("temporalPoolerRegion", "py.TMRegion",
-                      json.dumps(temporalParams))
-
-    network.link("spatialPoolerRegion", "temporalPoolerRegion", "UniformLink", "")
-    network.link("temporalPoolerRegion", "spatialPoolerRegion", "UniformLink", "",
-                 srcOutput="topDownOut", destInput="topDownIn")
     
-    # Add the AnomalyLikelihoodRegion on top of the TMRegion
-    network.addRegion("anomalyLikelihoodRegion", "py.AnomalyLikelihoodRegion", json.dumps({}))
-    network.link("temporalPoolerRegion", "anomalyLikelihoodRegion", "UniformLink",
-                 "", srcOutput="anomalyScore", destInput="rawAnomalyScore")
-    network.link("sensor", "anomalyLikelihoodRegion", "UniformLink", "",
-                 srcOutput="sourceOut", destInput="metricValue")    
-
-
-    spatialPoolerRegion = network.regions["spatialPoolerRegion"]
-
-    # Make sure learning is enabled
-    spatialPoolerRegion.setParameter("learningMode", True)
-    # We want temporal anomalies so disable anomalyMode in the SP. This mode is
-    # used for computing anomalies in a non-temporal model.
-    spatialPoolerRegion.setParameter("anomalyMode", False)
-
-    temporalPoolerRegion = network.regions["temporalPoolerRegion"]
-
-    # Enable topDownMode to get the predicted columns output
-    temporalPoolerRegion.setParameter("topDownMode", True)
-    # Make sure learning is enabled (this is the default)
-    temporalPoolerRegion.setParameter("learningMode", True)
-    # Enable inference mode so we get predictions
-    temporalPoolerRegion.setParameter("inferenceMode", True)
-    # Enable anomalyMode to compute the anomaly score.
-    temporalPoolerRegion.setParameter("anomalyMode", True)
+    if use_saved_model == False:
+        network.addRegion("sensor", "py.RecordSensor",
+                        json.dumps({"verbosity": verbosity}))
+    
+        sensor = network.regions["sensor"].getSelf()
+        sensor.encoder = encoder
+        sensor.dataSource = FileRecordStream(streamID=inputFilePath)
+    
+        # Create the spatial pooler region
+        spatialParams["inputWidth"] = sensor.encoder.getWidth()
+        network.addRegion("spatialPoolerRegion", "py.SPRegion",
+                          json.dumps(spatialParams))
+    
+        # Link the SP region to the sensor input
+        network.link("sensor", "spatialPoolerRegion", "UniformLink", "")
+        network.link("sensor", "spatialPoolerRegion", "UniformLink", "",
+                     srcOutput="resetOut", destInput="resetIn")
+        network.link("spatialPoolerRegion", "sensor", "UniformLink", "",
+                     srcOutput="spatialTopDownOut", destInput="spatialTopDownIn")
+        network.link("spatialPoolerRegion", "sensor", "UniformLink", "",
+                     srcOutput="temporalTopDownOut", destInput="temporalTopDownIn")
+    
+        # Add the TPRegion on top of the SPRegion
+        network.addRegion("temporalPoolerRegion", "py.TMRegion",
+                          json.dumps(temporalParams))
+    
+        network.link("spatialPoolerRegion", "temporalPoolerRegion", "UniformLink", "")
+        network.link("temporalPoolerRegion", "spatialPoolerRegion", "UniformLink", "",
+                     srcOutput="topDownOut", destInput="topDownIn")
+        
+        # Add the AnomalyLikelihoodRegion on top of the TMRegion
+        network.addRegion("anomalyLikelihoodRegion", "py.AnomalyLikelihoodRegion", json.dumps({}))
+        network.link("temporalPoolerRegion", "anomalyLikelihoodRegion", "UniformLink",
+                     "", srcOutput="anomalyScore", destInput="rawAnomalyScore")
+        network.link("sensor", "anomalyLikelihoodRegion", "UniformLink", "",
+                     srcOutput="sourceOut", destInput="metricValue")    
+    
+    
+        spatialPoolerRegion = network.regions["spatialPoolerRegion"]
+    
+        # Make sure learning is enabled
+        spatialPoolerRegion.setParameter("learningMode", True)
+        # We want temporal anomalies so disable anomalyMode in the SP. This mode is
+        # used for computing anomalies in a non-temporal model.
+        spatialPoolerRegion.setParameter("anomalyMode", False)
+    
+        temporalPoolerRegion = network.regions["temporalPoolerRegion"]
+    
+        # Enable topDownMode to get the predicted columns output
+        temporalPoolerRegion.setParameter("topDownMode", True)
+        # Make sure learning is enabled (this is the default)
+        temporalPoolerRegion.setParameter("learningMode", True)
+        # Enable inference mode so we get predictions
+        temporalPoolerRegion.setParameter("inferenceMode", True)
+        # Enable anomalyMode to compute the anomaly score.
+        temporalPoolerRegion.setParameter("anomalyMode", True)
+    
+    else:
+        network = Network(model_path)
 
     return network
 
@@ -225,7 +234,8 @@ def runNetwork(network1,
                network11,
                network12,
                date1, 
-               input_data_file):
+               input_data_file,
+               save_network):
     
     sensorRegion1 = network1.regions["sensor"]
     anomalyLikelihoodRegion1 = network1.regions["anomalyLikelihoodRegion"]
@@ -813,6 +823,20 @@ def runNetwork(network1,
         
         time.sleep(0.01)
         plot.clf()
+    
+    if save_network == True:
+        network1.save('/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network1.nta')
+        network2.save('/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network2.nta')
+        network3.save('/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network3.nta')
+        network4.save('/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network4.nta')
+        network5.save('/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network5.nta')
+        network6.save('/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network6.nta')
+        network7.save('/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network7.nta')
+        network8.save('/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network8.nta')
+        network9.save('/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network9.nta')
+        network10.save('/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network10.nta')
+        network11.save('/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network11.nta')
+        network12.save('/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network12.nta')
 
 
 if __name__ == "__main__":
@@ -823,8 +847,26 @@ if __name__ == "__main__":
     
     # Global parameters here
     _VERBOSITY = 0
-    _NUM_RECORDS = 5914 - 3
+    _NUM_RECORDS = 5914 - 3  # 5914 in total
     _TIMEOFDAY = (21, 6)
+    _SAVE_MODEL = True
+    _USE_SAVED_MODEL = False
+    
+    if _USE_SAVED_MODEL:
+        _RESTORE_PATH = ['/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network1.nta',
+                         '/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network2.nta',
+                         '/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network3.nta',
+                         '/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network4.nta',
+                         '/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network5.nta',
+                         '/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network6.nta',
+                         '/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network7.nta',
+                         '/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network8.nta',
+                         '/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network9.nta',
+                         '/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network10.nta',
+                         '/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network11.nta',
+                         '/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network12.nta']
+    else:
+        _RESTORE_PATH = [None,None,None,None,None,None,None,None,None,None,None,None]
     # -------------------------------------------------------------------------
     #
     #
@@ -1249,62 +1291,86 @@ if __name__ == "__main__":
     MatteCu_network = createTemporalAnomaly(MatteCu_recordParams,
                                             spatialParams=_SP_PARAMS,
                                             temporalParams=_TM_PARAMS,
-                                            verbosity=_VERBOSITY)
+                                            verbosity=_VERBOSITY,
+                                            use_saved_model = _USE_SAVED_MODEL,
+                                            model_path = _RESTORE_PATH[0])
 
     MatteFe_network = createTemporalAnomaly(MatteFe_recordParams,
                                             spatialParams=_SP_PARAMS,
                                             temporalParams=_TM_PARAMS,
-                                            verbosity=_VERBOSITY)
+                                            verbosity=_VERBOSITY,
+                                            use_saved_model = _USE_SAVED_MODEL,
+                                            model_path = _RESTORE_PATH[1])
 
     MattePb_network = createTemporalAnomaly(MattePb_recordParams,
                                             spatialParams=_SP_PARAMS,
                                             temporalParams=_TM_PARAMS,
-                                            verbosity=_VERBOSITY)
+                                            verbosity=_VERBOSITY,
+                                            use_saved_model = _USE_SAVED_MODEL,
+                                            model_path = _RESTORE_PATH[2])
     
     MatteZn_network = createTemporalAnomaly(MatteZn_recordParams,
                                             spatialParams=_SP_PARAMS,
                                             temporalParams=_TM_PARAMS,
-                                            verbosity=_VERBOSITY)
+                                            verbosity=_VERBOSITY,
+                                            use_saved_model = _USE_SAVED_MODEL,
+                                            model_path = _RESTORE_PATH[3])
     
     SlagCu_network = createTemporalAnomaly(SlagCu_recordParams,
                                             spatialParams=_SP_PARAMS,
                                             temporalParams=_TM_PARAMS,
-                                            verbosity=_VERBOSITY)
+                                            verbosity=_VERBOSITY,
+                                            use_saved_model = _USE_SAVED_MODEL,
+                                            model_path = _RESTORE_PATH[4])
     
     SlagFe_network = createTemporalAnomaly(SlagFe_recordParams,
                                             spatialParams=_SP_PARAMS,
                                             temporalParams=_TM_PARAMS,
-                                            verbosity=_VERBOSITY)
+                                            verbosity=_VERBOSITY,
+                                            use_saved_model = _USE_SAVED_MODEL,
+                                            model_path = _RESTORE_PATH[5])
     
     SlagPb_network = createTemporalAnomaly(SlagPb_recordParams,
                                             spatialParams=_SP_PARAMS,
                                             temporalParams=_TM_PARAMS,
-                                            verbosity=_VERBOSITY)
+                                            verbosity=_VERBOSITY,
+                                            use_saved_model = _USE_SAVED_MODEL,
+                                            model_path = _RESTORE_PATH[6])
     
     SlagZn_network = createTemporalAnomaly(SlagZn_recordParams,
                                             spatialParams=_SP_PARAMS,
                                             temporalParams=_TM_PARAMS,
-                                            verbosity=_VERBOSITY)
+                                            verbosity=_VERBOSITY,
+                                            use_saved_model = _USE_SAVED_MODEL,
+                                            model_path = _RESTORE_PATH[7])
     
     FeSiO2_network = createTemporalAnomaly(FeSiO2_recordParams,
                                             spatialParams=_SP_PARAMS,
                                             temporalParams=_TM_PARAMS,
-                                            verbosity=_VERBOSITY)
+                                            verbosity=_VERBOSITY,
+                                            use_saved_model = _USE_SAVED_MODEL,
+                                            model_path = _RESTORE_PATH[8])
     
     SlagCaO_network = createTemporalAnomaly(SlagCaO_recordParams,
                                             spatialParams=_SP_PARAMS,
                                             temporalParams=_TM_PARAMS,
-                                            verbosity=_VERBOSITY)
+                                            verbosity=_VERBOSITY,
+                                            use_saved_model = _USE_SAVED_MODEL,
+                                            model_path = _RESTORE_PATH[9])
     
     BathT_network = createTemporalAnomaly(BathT_recordParams,
                                             spatialParams=_SP_PARAMS,
                                             temporalParams=_TM_PARAMS,
-                                            verbosity=_VERBOSITY)
+                                            verbosity=_VERBOSITY,
+                                            use_saved_model = _USE_SAVED_MODEL,
+                                            model_path = _RESTORE_PATH[10])
     
     FreeboardT_network = createTemporalAnomaly(FreeboardT_recordParams,
                                             spatialParams=_SP_PARAMS,
                                             temporalParams=_TM_PARAMS,
-                                            verbosity=_VERBOSITY)
+                                            verbosity=_VERBOSITY,
+                                            use_saved_model = _USE_SAVED_MODEL,
+                                            model_path = _RESTORE_PATH[11])
     
     chemical_date = getDate(MatteCu_recordParams, _NUM_RECORDS)
     
@@ -1321,4 +1387,5 @@ if __name__ == "__main__":
                BathT_network,
                FreeboardT_network,
                chemical_date, 
-               input_data)
+               input_data,
+               _SAVE_MODEL)
