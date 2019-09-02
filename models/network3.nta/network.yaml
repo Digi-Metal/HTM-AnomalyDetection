@@ -1,0 +1,79 @@
+Version: 2
+Regions:
+  - name: sensor
+    nodeType: py.RecordSensor
+    dimensions:
+      - 1
+    phases:
+      - 0
+    label: R0
+  - name: spatialPoolerRegion
+    nodeType: py.SPRegion
+    dimensions:
+      - 1
+    phases:
+      - 1
+    label: R1
+  - name: temporalPoolerRegion
+    nodeType: py.TMRegion
+    dimensions:
+      - 1
+    phases:
+      - 2
+    label: R2
+  - name: anomalyLikelihoodRegion
+    nodeType: py.AnomalyLikelihoodRegion
+    dimensions:
+      - 1
+    phases:
+      - 3
+    label: R3
+Links:
+  - type: UniformLink
+    params: ""
+    srcRegion: spatialPoolerRegion
+    srcOutput: spatialTopDownOut
+    destRegion: sensor
+    destInput: spatialTopDownIn
+  - type: UniformLink
+    params: ""
+    srcRegion: spatialPoolerRegion
+    srcOutput: temporalTopDownOut
+    destRegion: sensor
+    destInput: temporalTopDownIn
+  - type: UniformLink
+    params: ""
+    srcRegion: sensor
+    srcOutput: dataOut
+    destRegion: spatialPoolerRegion
+    destInput: bottomUpIn
+  - type: UniformLink
+    params: ""
+    srcRegion: sensor
+    srcOutput: resetOut
+    destRegion: spatialPoolerRegion
+    destInput: resetIn
+  - type: UniformLink
+    params: ""
+    srcRegion: temporalPoolerRegion
+    srcOutput: topDownOut
+    destRegion: spatialPoolerRegion
+    destInput: topDownIn
+  - type: UniformLink
+    params: ""
+    srcRegion: spatialPoolerRegion
+    srcOutput: bottomUpOut
+    destRegion: temporalPoolerRegion
+    destInput: bottomUpIn
+  - type: UniformLink
+    params: ""
+    srcRegion: sensor
+    srcOutput: sourceOut
+    destRegion: anomalyLikelihoodRegion
+    destInput: metricValue
+  - type: UniformLink
+    params: ""
+    srcRegion: temporalPoolerRegion
+    srcOutput: anomalyScore
+    destRegion: anomalyLikelihoodRegion
+    destInput: rawAnomalyScore

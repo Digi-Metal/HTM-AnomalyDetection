@@ -849,8 +849,8 @@ if __name__ == "__main__":
     _VERBOSITY = 0
     _NUM_RECORDS = 5914 - 3  # 5914 in total
     _TIMEOFDAY = (21, 6)
-    _SAVE_MODEL = True
-    _USE_SAVED_MODEL = False
+    _SAVE_MODEL = False
+    _USE_SAVED_MODEL = True
     
     if _USE_SAVED_MODEL:
         _RESTORE_PATH = ['/media/tpc2/DATA/project/HTM-AnomalyDetection/models/network1.nta',
