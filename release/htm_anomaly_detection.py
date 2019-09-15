@@ -6,22 +6,21 @@ Created on Mon Sep  9 09:33:14 2019
 """
 
 import json
-from itertools import islice
-from datetime import datetime
-from streamReader import streamReader
 from nupic.engine import Network
 from nupic.encoders import MultiEncoder, ScalarEncoder, DateEncoder
 
 
-
 class HTM:
     '''
-    HTM class for create networks and do prediction.
+    The HTM class which packaging the methods that used to create 
+    networks and do prediction.
+    
     -- getEncoderParams: read encoder parameters from json files
     -- setEncoderParams: write encoder parameters to json files
     -- createNetwork: create HTM network based on parameters and data source
-    -- run: run a pre-defined HTM network. You need to loop this method for
-            iterative prediction on records
+    -- run: run a pre-defined HTM network once if network.run(1). You need to 
+            loop this method for iterative prediction on records 
+            (see my ipynb file for the usage)
     -- save_network: save the network structure and states after running
     '''
     
@@ -119,20 +118,17 @@ class HTM:
         
         else:
             network = Network(model_path)
-    
+           
         return network
     
     
     def run(self, network):
         sensorRegion = network.regions["sensor"]
         anomalyLikelihoodRegion = network.regions["anomalyLikelihoodRegion"]
-        try:
-            network.run(1)
-            anomalyLikelihood = anomalyLikelihoodRegion.getOutputData("anomalyLikelihood")[0]
-            fed_in_data = sensorRegion.getOutputData("sourceOut")[0]
-            return fed_in_data, anomalyLikelihood
-        except:
-            raise StopIteration
+        network.run(1)
+        anomalyLikelihood = anomalyLikelihoodRegion.getOutputData("anomalyLikelihood")[0]
+        fed_in_data = sensorRegion.getOutputData("sourceOut")[0]
+        return fed_in_data, anomalyLikelihood
     
     
     def save_network(self, network, model_path):
