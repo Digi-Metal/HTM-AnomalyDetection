@@ -11,8 +11,9 @@ import time
 import psutil
 from htm_anomaly_detection import HTM
 
+# use model or not to create a HTM instance
 model = HTM(use_saved_model = False, checkpoint_path = None, likelihood_path = None)
-#model = HTM(use_saved_model = True, checkpoint_path = 'model.pkl')
+#model = HTM(use_saved_model = True, checkpoint_path = 'model', likelihood_path = 'likelihood.pkl')
 
 i = 1
 while True:

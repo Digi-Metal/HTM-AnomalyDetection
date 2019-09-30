@@ -17,7 +17,7 @@ class HTM:
     -- run: run a pre-defined HTM network once if network.run(1). You need to 
             loop this method for iterative prediction on records 
             (see my ipynb file for the usage)
-    -- save_network: save the network structure and states after running
+    -- save_model: save the model and states after running
     '''
     
     def __init__(self, use_saved_model, checkpoint_path, likelihood_path):
@@ -27,7 +27,7 @@ class HTM:
             self.model.enableInference({'predictedField': 'cpu'})
             self.model.enableInference({'predictedField': 'memory'})
             with open(likelihood_path, "rb") as f:
-                self.anomalyLikelihood.readFromFile(f)
+                self.anomalyLikelihood = anomaly_likelihood.AnomalyLikelihood().readFromFile(f)
         else:
             self.model = ModelFactory.create(model_params.MODEL_PARAMS)
             self.model.enableInference({'predictedField': 'cpu'})
@@ -36,6 +36,7 @@ class HTM:
 
                
     def run(self, cpu, memory, timestamp):
+	# bond those input variables together as modelInput
         modelInput = {'cpu': float(cpu),
                       'memory': float(memory),
                       'timestamp': timestamp
