@@ -25,7 +25,7 @@ while True:
     
     print timestamp.strftime("%Y-%m-%d %H:%M:%S"), '\tCPU:', cpu, '\tMemory:', memory, '\tAnomaly likelihood:', anomaly_likelihood
     
-    if i % 10 == 0:
+    if i % 10000 == 0:
         model.save_model(os.path.join(os.getcwd(), "model"),
                          os.path.join(os.getcwd(), "likelihood.pkl"))
         print 'checkpoint saved.'

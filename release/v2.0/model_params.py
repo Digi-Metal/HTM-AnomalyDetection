@@ -36,7 +36,7 @@ MODEL_PARAMS = {
                 'memory': {
                     'fieldname': u'memory',
                     'n': 50,
-                    'name': u'cpu',
+                    'name': u'memory',
                     'type': 'ScalarEncoder',
                     'minval': 0.0,
                     'maxval': 100.0,
@@ -45,7 +45,7 @@ MODEL_PARAMS = {
                 u'timestamp_timeOfDay': {
                     'fieldname': u'timestamp',
                     'name': u'timestamp_timeOfDay',
-                    'timeOfDay': (21, 1),
+                    'timeOfDay': (21, 0.3),
                     'type': 'DateEncoder'
                 },
                 u'timestamp_dayOfWeek': None,
