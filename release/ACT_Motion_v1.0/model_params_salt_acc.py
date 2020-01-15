@@ -39,7 +39,7 @@ MODEL_PARAMS = {
                     'name': u'y',
                     'type': 'ScalarEncoder',
                     'minval': -0.068,
-                    'maxval': 0.20,
+                    'maxval': 0.23,
                     'w': 21
                 }, 
                 'z': {

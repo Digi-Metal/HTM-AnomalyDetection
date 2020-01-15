@@ -21,7 +21,25 @@ def data_simulator(raw, sample):
     data = random.sample(raw, sample)
     return float(data[0])
 
-    
+def getAverageAnomaly(raw1, raw2, raw3, raw4):
+    average = (raw1 + raw2 + raw3 + raw4) / 4.0
+    if raw1 < 0.99 and raw2 < 0.99 and raw3 < 0.99 and raw4 < 0.99:
+        return "Good condition", average
+    elif raw1 >= 0.99 and raw2 < 0.99 and raw3 < 0.99 and raw4 < 0.99:
+        return "Warning condition", average
+    elif raw1 < 0.99 and raw2 >= 0.99 and raw3 < 0.99 and raw4 < 0.99:
+        return "Warning condition", average
+    elif raw1 < 0.99 and raw2 < 0.99 and raw3 >= 0.99 and raw4 < 0.99:
+        return "Warning condition", average
+    elif raw1 < 0.99 and raw2 < 0.99 and raw3 < 0.99 and raw4 >= 0.99:
+        return "Warning condition", average
+    elif raw1 >= 0.99 or raw2 >= 0.99 or raw3 >= 0.99 or raw4 >= 0.99:
+        return "Bad condition", average
+    elif average > 0.8 and average < 0.9:
+        return "Warning condition", average
+    elif average >= 0.9:
+        return "Bad condition", average
+
 '''
 use model or not to create a HTM instance
 '''
@@ -80,9 +98,15 @@ while True:
                                                          pepa_qua_z,
                                                          timestamp)
     
-    print timestamp.strftime("%Y-%m-%d %H:%M:%S"), '\tSALT_ACC_Anomaly:', \
-    anomaly_likelihood1, '\tSALT_QUA_Anomaly:', anomaly_likelihood2, \
-    '\tPEPA_ACC_Anomaly:', anomaly_likelihood3, '\tPEPA_QUA_Anomaly:', anomaly_likelihood4
+    RunningCondition, AverageAnomaly = getAverageAnomaly(anomaly_likelihood1, 
+                                         anomaly_likelihood2, 
+                                         anomaly_likelihood3, 
+                                         anomaly_likelihood4)
+    
+    print timestamp.strftime("%Y-%m-%d %H:%M:%S"), '\tSALT_ACC:', \
+    round(anomaly_likelihood1,2), '\tSALT_QUA:', round(anomaly_likelihood2,2), \
+    '\tPEPA_ACC:', round(anomaly_likelihood3,2), '\tPEPA_QUA:', round(anomaly_likelihood4,2), \
+    '\t', RunningCondition, '\tAnomaly:', round(AverageAnomaly,2)
     
     # saving model after a while
     if i % 1000 == 0:

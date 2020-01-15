@@ -29,7 +29,7 @@ MODEL_PARAMS = {
                     'n': 50,
                     'name': u'w',
                     'type': 'ScalarEncoder',
-                    'minval': -0.71,
+                    'minval': -0.72,
                     'maxval': 0.70,
                     'w': 21
                 },   
@@ -47,7 +47,7 @@ MODEL_PARAMS = {
                     'n': 50,
                     'name': u'y',
                     'type': 'ScalarEncoder',
-                    'minval': -0.71,
+                    'minval': -0.72,
                     'maxval': 0.70,
                     'w': 21
                 },   
@@ -56,7 +56,7 @@ MODEL_PARAMS = {
                     'n': 50,
                     'name': u'z',
                     'type': 'ScalarEncoder',
-                    'minval': -0.70,
+                    'minval': -0.72,
                     'maxval': 0.69,
                     'w': 21
                 },   
