@@ -10,6 +10,10 @@ This repository only contains the code snippet and data that used by NuPic to sh
 
 ## Running screenshots
 
+#### 30/01/2020
+We have integrated HTM backend scripts into Outotec ACT and finally made this workable in an industrial environment!
+![chemicalHTM](https://github.com/KimMeen/HTM-AnomalyDetection/blob/master/docs/Screenshot6.png)
+
 #### 08/12/2019 
 I implementeed another HTM scirpt for chemical data that generated from the furnace simulation, as you can see in the figure below.
 
